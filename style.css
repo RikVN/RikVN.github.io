@@ -1,0 +1,158 @@
+
+
+/* Voor het tekstvak */
+div.container {
+    width: 70%;
+    /*border: 1px solid gray;*/
+    margin: 0 auto;
+    background-color: #f1f1f1;  /*hiermee kun je de kleur van het menu aanpassen*/
+	box-shadow:  0px  0px  15px  1px  #666;
+}
+
+/* Voor de achtergrond en lettertype van alle tekst */
+body {
+   background-color: #e8f0ff; 
+   font-family: "Arial";
+}
+
+header{
+    padding: 1em;
+    color: white;
+    background-color: #173e7c;
+    clear: left;
+    text-align: center;
+}
+
+ footer {
+    padding: 1em;
+    color: white;
+    background-color: #173e7c;
+    clear: left;
+    text-align: center;
+	font-size: 12px;
+}
+
+/* Code voor tekstvak */
+
+article {
+    margin-left: 170px;
+    padding: 2em;
+    overflow: hidden;
+    background-color: white; 
+	text-align: justify;
+    
+}
+
+
+/*Code voor het menu*/
+nav {
+    float: left;
+    width: 160px;
+    margin: 0;
+	font-weight: bold;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 170px;
+    background-color: #f1f1f1;
+	
+}
+
+
+li a {
+    display: block;
+    color: #000;
+    padding: 8px 16px;
+    text-decoration: none;
+	
+}
+
+li a.active {
+    background-color: #3e7fe8;
+    color: white;
+	padding: 8px 16px;
+	
+}
+
+li a:hover:not(.active) {
+    background-color: #555;
+    color: white;
+	
+}
+
+
+/*Code voor menu items met dropdown menu */
+.dropbtn {
+    background-color: #f1f1f1;
+    font-family: "Arial";
+    text-align: left;
+    padding: 8px 16px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    width:170px;
+	font-weight: bold;
+	
+
+}
+
+.dropbtn2 {
+    background-color: #3e7fe8;
+    font-family: "Arial";
+    text-align: left;
+    padding: 8px 16px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    width:170px;
+    color: white;
+	font-weight: bold;
+	
+
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+   
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    left:100%;
+    top: -0px;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+	
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 7.9px 16px;
+    text-decoration: none;
+    display: block;
+	
+}
+
+.dropdown-content a:hover {
+    background-color: #555;
+    color: white;
+    padding: 7.9px 16px;
+	
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown:hover .dropbtn {
+    background-color: #555;
+    color: white;
+	padding: 7.9px 16px;
+}
+
