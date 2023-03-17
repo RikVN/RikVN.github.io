@@ -125,6 +125,7 @@
       2 Sheila Dunning
       2 Scott Mayer McKinney
       2 Scott Gray
+      2 Samuel Wolrich
       2 Peter Hoeschele
       2 Oleg Boiko
       2 Nitish Shirish Keskar
@@ -163,6 +164,7 @@
       2 Eric Sigler
       2 Elizabeth Tseng
       2 Daniel Selsam
+      2 Daniel Mossing
       2 Christopher Berner
       2 Christine McLeavey
       2 Christian Gibson
@@ -197,8 +199,6 @@
       1 Simón Posada Fishman
       1 Shino Jomoto
       1 Sherwin Wu
-      1 Sam Wolrich
-      1 Samuel Wolrich
       1 Sam Manning
       1 Sam Altman
       1 Ryan Greene
@@ -254,8 +254,6 @@
       1 David Medina
       1 David Dohan
       1 Dave Cummings
-      1 Dan Mossing
-      1 Daniel Mossing
       1 Damien Deville
       1 Cory Decareaux
       1 Chris Hallacy
