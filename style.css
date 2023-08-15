@@ -1,4 +1,13 @@
 
+table {
+  border-collapse: separate;
+  border-spacing: 0px 0px;
+  margin-left: 0px;
+}
+
+td {
+	padding-right: 10px;
+}
 
 /* Voor het tekstvak */
 div.container {
