@@ -74,6 +74,8 @@ input, select {
   display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 0 0 18px;
 }
 .control-group { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 14px; font-weight: 700; }
+.compare-controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.compare-controls select { min-width: 170px; }
 .view-card {
   background: rgba(255,255,255,.86); border: 1px solid var(--border); border-radius: 24px;
   box-shadow: var(--shadow); padding: 22px; min-height: 420px; overflow: hidden;
@@ -97,6 +99,8 @@ tbody tr:hover { background: #fafbff; }
 .badge.good { color: var(--good); background: #ecfdf5; border-color: #bbf7d0; }
 .badge.warn { color: var(--warn); background: #fff7ed; border-color: #fed7aa; }
 .badge.bad { color: var(--bad); background: #fef3f2; border-color: #fecaca; }
+.good-text { color: var(--good); }
+.bad-text { color: var(--bad); }
 .people { color: #334155; }
 .answer { font-weight: 760; }
 .category { color: var(--muted); }
@@ -140,6 +144,7 @@ tbody tr:hover { background: #fafbff; }
       <nav class="nav" aria-label="Dashboard sections">
         <button class="nav-button active" data-view="overview">Overview</button>
         <button class="nav-button" data-view="categories">Category tables</button>
+        <button class="nav-button" data-view="compareQuizzers">Compare quizzers</button>
         <button class="nav-button" data-view="rareCorrect">Solos, duos & trios</button>
         <button class="nav-button" data-view="negativeRare">Negative solos, duos & trios</button>
         <button class="nav-button" data-view="xFullHouses">X's and Full Houses</button>
@@ -170,10 +175,13 @@ let currentView = 'overview';
 let overviewSort = { key: 'total', direction: 'desc' };
 let metricSort = { key: 'inverse', direction: 'desc' };
 let averageMetricSort = { key: 'averageKnown', direction: 'asc' };
+const storageKey = 'wqc-dashboard-compare-state';
+let compareState = loadCompareState();
 
 const titles = {
   overview: 'Overview',
   categories: 'Category tables',
+  compareQuizzers: 'Compare quizzers',
   rareCorrect: 'Solos, duos & trios',
   negativeRare: 'Negative solos, duos & trios',
   xFullHouses: "X's and Full Houses",
@@ -228,8 +236,26 @@ function render() {
 
 function renderControls() {
   if (currentView === 'categories') {
-    setControls(`<label class="control-group control-group-large">Category <select id="categorySelect" class="big-select">${data.meta.categories.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('')}</select></label>`);
-    document.getElementById('categorySelect').addEventListener('change', renderMainOnly);
+    setControls(`<label class="control-group control-group-large">Category <select id="categorySelect" class="big-select">${data.meta.categories.map(c => `<option value="${escapeHtml(c)}"${c === compareState.category ? ' selected' : ''}>${escapeHtml(c)}</option>`).join('')}</select></label>`);
+    document.getElementById('categorySelect').addEventListener('change', event => {
+      compareState.category = event.target.value;
+      saveCompareState();
+      renderMainOnly();
+    });
+  } else if (currentView === 'compareQuizzers') {
+    setControls(renderCompareControls());
+    document.getElementById('compareCategorySelect').addEventListener('change', event => {
+      compareState.category = event.target.value;
+      saveCompareState();
+      renderMainOnly();
+    });
+    for (const select of document.querySelectorAll('.compare-quizzer-select')) {
+      select.addEventListener('change', event => {
+        compareState.quizzers[Number(event.target.dataset.index)] = event.target.value;
+        saveCompareState();
+        renderMainOnly();
+      });
+    }
   } else if (currentView === 'teams') {
     setControls(`
       <label class="control-group">Team size <select id="teamSizeSelect">${data.meta.teamSizes.map(s => `<option value="${s}"${String(s) === '4' ? ' selected' : ''}>${s}</option>`).join('')}</select></label>
@@ -254,6 +280,7 @@ function renderMainOnly() {
   const renderers = {
     overview: renderOverview,
     categories: renderCategories,
+    compareQuizzers: renderCompareQuizzers,
     rareCorrect: renderRareCorrect,
     negativeRare: renderNegativeRare,
     xFullHouses: renderXFullHouses,
@@ -310,6 +337,72 @@ function attachOverviewSortHandlers() {
       renderMainOnly();
     });
   }
+}
+
+function loadCompareState() {
+  const fallback = {
+    category: data.meta.categories[0],
+    quizzers: data.players.slice(0, 5),
+  };
+  while (fallback.quizzers.length < 5) fallback.quizzers.push('');
+  try {
+    const saved = JSON.parse(localStorage.getItem(storageKey) || '{}');
+    const category = data.meta.categories.includes(saved.category) ? saved.category : fallback.category;
+    const quizzers = Array.isArray(saved.quizzers) ? saved.quizzers.slice(0, 5) : fallback.quizzers;
+    while (quizzers.length < 5) quizzers.push('');
+    return {
+      category,
+      quizzers: quizzers.map(name => name === '' || data.players.includes(name) ? name : ''),
+    };
+  } catch {
+    return fallback;
+  }
+}
+
+function saveCompareState() {
+  localStorage.setItem(storageKey, JSON.stringify(compareState));
+}
+
+function playerOptions(selectedName) {
+  return `<option value="">—</option>` + data.players.map(player => `<option value="${escapeHtml(player)}"${player === selectedName ? ' selected' : ''}>${escapeHtml(player)}</option>`).join('');
+}
+
+function renderCompareControls() {
+  const categorySelect = `<label class="control-group control-group-large">Category <select id="compareCategorySelect" class="big-select">${data.meta.categories.map(c => `<option value="${escapeHtml(c)}"${c === compareState.category ? ' selected' : ''}>${escapeHtml(c)}</option>`).join('')}</select></label>`;
+  const quizzerSelects = Array.from({ length: 5 }, (_, index) => `
+    <label class="control-group">Quizzer ${index + 1}
+      <select class="compare-quizzer-select" data-index="${index}">${playerOptions(compareState.quizzers[index] || '')}</select>
+    </label>`).join('');
+  return `<div class="compare-controls">${categorySelect}${quizzerSelects}</div>`;
+}
+
+function selectedCompareQuizzers() {
+  const seen = new Set();
+  const selected = [];
+  for (const name of compareState.quizzers) {
+    if (!name || seen.has(name)) continue;
+    seen.add(name);
+    selected.push(name);
+  }
+  return selected;
+}
+
+function renderCompareQuizzers() {
+  const category = compareState.category || data.meta.categories[0];
+  const quizzers = selectedCompareQuizzers();
+  const rows = data.categoryTables[category] || [];
+  if (!quizzers.length) {
+    return heading('Compare quizzers', 'Select up to five quizzers to compare their 1/0 scores for one category.') + '<div class="empty">Select at least one quizzer above.</div>';
+  }
+  const headers = ['Q#', 'Answer', 'Total', ...quizzers];
+  return heading(`Compare quizzers: ${category}`, 'The page remembers the selected category and quizzers. 1 = correct, 0 = wrong.') + table(
+    headers,
+    rows,
+    row => `<tr><td class="num">${row.q}</td><td>${escapeHtml(row.answer)}</td><td class="num"><span class="badge ${row.total === 0 ? 'bad' : row.total === data.meta.playerCount ? 'good' : ''}">${row.total}</span></td>${quizzers.map(player => {
+      const correct = row.correct.includes(player);
+      return `<td class="num"><strong class="${correct ? 'good-text' : 'bad-text'}">${correct ? 1 : 0}</strong></td>`;
+    }).join('')}</tr>`
+  );
 }
 
 function renderCategories() {
