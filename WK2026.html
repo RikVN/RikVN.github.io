@@ -34,7 +34,7 @@ h1 { font-size: 18px; margin: 0 0 4px; line-height: 1.2; }
 .nav-button { border: 0; width: 100%; text-align: left; cursor: pointer; border-radius: 13px; padding: 11px 13px; background: transparent; color: #334155; font: inherit; font-weight: 650; }
 .nav-button:hover { background: var(--panel-soft); }
 .nav-button.active { background: var(--accent-soft); color: var(--accent); }
-.content { padding: 30px; min-width: 0; }
+.content { padding: 30px 30px 70px; min-width: 0; }
 .topbar { display: flex; justify-content: space-between; gap: 20px; align-items: end; margin-bottom: 18px; }
 .eyebrow { color: var(--accent); text-transform: uppercase; letter-spacing: .09em; font-size: 12px; font-weight: 800; margin: 0 0 7px; }
 h2 { font-size: clamp(28px, 4vw, 44px); line-height: 1; margin: 0; letter-spacing: -.04em; }
@@ -49,12 +49,17 @@ input, select { border: 1px solid var(--border); border-radius: 13px; background
 .section-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; margin: 4px 0 16px; }
 .section-heading h3 { margin: 0; font-size: 24px; letter-spacing: -.02em; }
 .section-heading p { margin: 0; color: var(--muted); }
-.table-wrap { overflow: auto; border: 1px solid var(--border); border-radius: 16px; }
-.top-scrollbar { overflow-x: auto; overflow-y: hidden; height: 18px; margin: 0 0 8px; border: 1px solid var(--border); border-radius: 999px; background: rgba(248,250,252,.92); }
-.top-scrollbar-inner { height: 1px; }
-.top-scrollbar::-webkit-scrollbar { height: 12px; }
-.top-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; border: 3px solid #f8fafc; }
-.top-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.table-wrap { overflow-x: auto; overflow-y: visible; border: 1px solid var(--border); border-radius: 16px; scrollbar-width: none; -ms-overflow-style: none; }
+.table-wrap::-webkit-scrollbar { display: none; }
+.page-scrollbar { position: fixed; left: 24px; bottom: 14px; width: 50vw; height: 20px; overflow-x: auto; overflow-y: hidden; z-index: 1000; display: none; border: 1px solid var(--border); border-radius: 999px; background: rgba(248,250,252,.96); box-shadow: 0 12px 30px rgba(15,23,42,.16); }
+.page-scrollbar-inner { height: 1px; }
+.page-scrollbar::-webkit-scrollbar { height: 14px; }
+.page-scrollbar::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 999px; border: 3px solid #f8fafc; }
+.page-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.sticky-first-two th:nth-child(1), .sticky-first-two td:nth-child(1) { position: sticky; left: 0; min-width: 76px; width: 76px; z-index: 3; background: #fff; box-shadow: 1px 0 0 var(--border); }
+.sticky-first-two th:nth-child(2), .sticky-first-two td:nth-child(2) { position: sticky; left: 76px; min-width: 260px; z-index: 3; background: #fff; box-shadow: 1px 0 0 var(--border); }
+.sticky-first-two th:nth-child(1), .sticky-first-two th:nth-child(2) { background: #f8fafc; z-index: 5; }
+.sticky-first-two tbody tr:hover td:nth-child(1), .sticky-first-two tbody tr:hover td:nth-child(2) { background: #fafbff; }
 table { border-collapse: collapse; width: 100%; min-width: 720px; background: #fff; }
 th, td { text-align: center; padding: 11px 13px; border-bottom: 1px solid var(--border); vertical-align: middle; }
 th { position: sticky; top: 0; background: #f8fafc; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: .06em; z-index: 1; }
@@ -169,6 +174,10 @@ function table(headers, rows, rowRenderer) {
   if (!rows.length) return '<div class="empty">No rows to show.</div>';
   return `<div class="table-wrap"><table><thead><tr>${headers.map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(rowRenderer).join('')}</tbody></table></div>`;
 }
+function categoryTable(headers, rows, rowRenderer) {
+  if (!rows.length) return '<div class="empty">No rows to show.</div>';
+  return `<div class="table-wrap sticky-first-two"><table><thead><tr>${headers.map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(rowRenderer).join('')}</tbody></table></div>`;
+}
 function answerWithCategory(row) { return `<span class="answer">${escapeHtml(row.answer)}</span> <span class="category">(${escapeHtml(categoryLabel(row.category))})</span>`; }
 
 function render() { titleEl.textContent = titles[currentView] || currentView; renderControls(); renderMainOnly(); }
@@ -205,41 +214,80 @@ function renderMainOnly() {
   view.innerHTML = (renderers[currentView] || renderOverview)();
   if (currentView === 'overview') attachOverviewSortHandlers();
   if (currentView === 'metrics') attachMetricSortHandlers();
-  addTopScrollbars();
+  updateFloatingScrollbarTarget();
 }
 
-function addTopScrollbars() {
-  for (const wrap of view.querySelectorAll('.table-wrap')) {
-    if (wrap.dataset.topScrollbarReady === '1') continue;
-    wrap.dataset.topScrollbarReady = '1';
+let floatingScrollbar = null;
+let floatingInner = null;
+let activeScrollWrap = null;
+let floatingSyncing = false;
 
-    // Only add the convenience scrollbar when the table is actually wider than its container.
-    if (wrap.scrollWidth <= wrap.clientWidth + 2) continue;
+function ensureFloatingScrollbar() {
+  if (floatingScrollbar) return;
+  floatingScrollbar = document.createElement('div');
+  floatingScrollbar.className = 'page-scrollbar';
+  floatingScrollbar.setAttribute('aria-label', 'Horizontal table scrollbar');
+  floatingInner = document.createElement('div');
+  floatingInner.className = 'page-scrollbar-inner';
+  floatingScrollbar.appendChild(floatingInner);
+  document.body.appendChild(floatingScrollbar);
 
-    const top = document.createElement('div');
-    top.className = 'top-scrollbar';
-    top.setAttribute('aria-hidden', 'true');
+  floatingScrollbar.addEventListener('scroll', () => {
+    if (!activeScrollWrap || floatingSyncing) return;
+    floatingSyncing = true;
+    activeScrollWrap.scrollLeft = floatingScrollbar.scrollLeft;
+    floatingSyncing = false;
+  });
 
-    const inner = document.createElement('div');
-    inner.className = 'top-scrollbar-inner';
-    inner.style.width = `${wrap.scrollWidth}px`;
-    top.appendChild(inner);
+  window.addEventListener('scroll', () => requestAnimationFrame(updateFloatingScrollbarTarget), { passive: true });
+  window.addEventListener('resize', () => requestAnimationFrame(updateFloatingScrollbarTarget));
+}
 
-    let syncing = false;
-    top.addEventListener('scroll', () => {
-      if (syncing) return;
-      syncing = true;
-      wrap.scrollLeft = top.scrollLeft;
-      syncing = false;
-    });
-    wrap.addEventListener('scroll', () => {
-      if (syncing) return;
-      syncing = true;
-      top.scrollLeft = wrap.scrollLeft;
-      syncing = false;
-    });
+function attachTableScrollSync(wrap) {
+  if (wrap.dataset.floatScrollbarReady === '1') return;
+  wrap.dataset.floatScrollbarReady = '1';
+  wrap.addEventListener('scroll', () => {
+    if (wrap !== activeScrollWrap || floatingSyncing || !floatingScrollbar) return;
+    floatingSyncing = true;
+    floatingScrollbar.scrollLeft = wrap.scrollLeft;
+    floatingSyncing = false;
+  });
+}
 
-    wrap.parentNode.insertBefore(top, wrap);
+function visibleScore(element) {
+  const rect = element.getBoundingClientRect();
+  const top = Math.max(rect.top, 0);
+  const bottom = Math.min(rect.bottom, window.innerHeight - 42);
+  return Math.max(0, bottom - top);
+}
+
+function updateFloatingScrollbarTarget() {
+  ensureFloatingScrollbar();
+  const candidates = [...document.querySelectorAll('#view .table-wrap')]
+    .filter(wrap => wrap.scrollWidth > wrap.clientWidth + 2 && visibleScore(wrap) > 0);
+
+  if (!candidates.length) {
+    activeScrollWrap = null;
+    floatingScrollbar.style.display = 'none';
+    return;
+  }
+
+  activeScrollWrap = candidates.sort((a, b) => visibleScore(b) - visibleScore(a))[0];
+  attachTableScrollSync(activeScrollWrap);
+  const rect = activeScrollWrap.getBoundingClientRect();
+  const left = Math.max(16, rect.left);
+  const right = Math.min(window.innerWidth - 16, rect.right);
+  const width = Math.max(160, right - left);
+
+  floatingInner.style.width = `${activeScrollWrap.scrollWidth}px`;
+  floatingScrollbar.style.left = `${left}px`;
+  floatingScrollbar.style.width = `${width}px`;
+  floatingScrollbar.style.display = 'block';
+
+  if (!floatingSyncing) {
+    floatingSyncing = true;
+    floatingScrollbar.scrollLeft = activeScrollWrap.scrollLeft;
+    floatingSyncing = false;
   }
 }
 
@@ -306,7 +354,7 @@ function renderCompareQuizzers() {
 function renderCategories() {
   const category = document.getElementById('categorySelect')?.value || compareState.category;
   const rows = data.categoryTables[category] || [];
-  return heading(`Category: ${categoryLabel(category)}`, `${rows.length} questions`) + table(
+  return heading(`Category: ${categoryLabel(category)}`, `${rows.length} questions`) + categoryTable(
     ['Q#', 'Answer', 'Total', ...data.players],
     rows,
     row => `<tr><td class="num">${row.q}</td><td class="answer">${escapeHtml(row.answer)}</td><td class="num"><strong>${row.total}</strong></td>${data.players.map(player => `<td class="num">${row.correct.includes(player) ? 1 : 0}</td>`).join('')}</tr>`
