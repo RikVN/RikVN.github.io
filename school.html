@@ -1,0 +1,1472 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Schoolkeuze Groningen | Middelbare scholen vergelijken</title>
+  <meta name="description" content="Interactieve gids voor middelbare scholen in Groningen en omgeving: niveaus, profielen, filters, vergelijking en keuzehulp.">
+  <style>
+    :root {
+      --bg: #f7f3ec;
+      --paper: #fffdf8;
+      --ink: #222629;
+      --muted: #6b645c;
+      --line: rgba(34, 38, 41, .12);
+      --brand: #184e4b;
+      --brand2: #f28c38;
+      --brand3: #7b61ff;
+      --brand4: #0c7c8a;
+      --good: #18794e;
+      --shadow: 0 18px 45px rgba(28, 37, 44, .12);
+      --radius: 26px;
+      --radius-sm: 16px;
+      --max: 1180px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 7% 12%, rgba(242,140,56,.18) 0 18rem, transparent 20rem),
+        radial-gradient(circle at 88% 6%, rgba(12,124,138,.16) 0 22rem, transparent 24rem),
+        linear-gradient(180deg, #fbf7ef 0%, #f7f3ec 48%, #eef5f3 100%);
+      min-height: 100vh;
+    }
+    a { color: inherit; }
+    .wrap { width: min(var(--max), calc(100% - 36px)); margin-inline: auto; }
+    .skip {
+      position: absolute; left: -999px; top: 10px; background: #fff; color: #000; padding: 10px 14px; z-index: 10;
+    }
+    .skip:focus { left: 10px; }
+    header {
+      position: relative;
+      overflow: hidden;
+      padding: 28px 0 42px;
+      border-bottom: 1px solid var(--line);
+    }
+    nav {
+      display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 58px;
+    }
+    .logo { display: flex; align-items: center; gap: 12px; font-weight: 850; letter-spacing: -.03em; }
+    .logoMark {
+      width: 42px; height: 42px; border-radius: 14px; display:grid; place-items:center;
+      background: conic-gradient(from 210deg, var(--brand), var(--brand4), var(--brand2), var(--brand));
+      color: white; box-shadow: var(--shadow);
+      font-size: 22px;
+    }
+    nav .links { display:flex; gap: 10px; flex-wrap: wrap; justify-content:flex-end; }
+    nav a {
+      text-decoration: none; font-weight: 700; color: var(--brand); padding: 10px 12px;
+      border: 1px solid rgba(24,78,75,.16); border-radius: 999px; background: rgba(255,255,255,.55);
+    }
+    .hero {
+      display: grid; grid-template-columns: 1.15fr .85fr; gap: 34px; align-items: center;
+    }
+    .eyebrow {
+      display: inline-flex; align-items:center; gap: 9px; padding: 9px 12px; border-radius: 999px;
+      background: rgba(24,78,75,.08); color: var(--brand); font-weight: 800; margin-bottom: 18px;
+      border: 1px solid rgba(24,78,75,.13);
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(2.35rem, 6vw, 5.6rem);
+      line-height: .92;
+      letter-spacing: -.075em;
+      max-width: 850px;
+    }
+    .hero p {
+      margin: 22px 0 0; color: #514a43; font-size: clamp(1.05rem, 1.55vw, 1.34rem);
+      line-height: 1.55; max-width: 760px;
+    }
+    .heroActions { display:flex; flex-wrap:wrap; gap: 12px; margin-top: 28px; }
+    .btn {
+      border: 0; border-radius: 999px; padding: 13px 18px; font-weight: 850; cursor: pointer;
+      background: var(--brand); color: white; text-decoration: none; display:inline-flex; align-items:center; gap: 8px;
+      box-shadow: 0 10px 25px rgba(24,78,75,.24);
+    }
+    .btn.secondary { background: white; color: var(--brand); border: 1px solid rgba(24,78,75,.2); box-shadow: none; }
+    .heroPanel {
+      background: rgba(255,253,248,.72); border: 1px solid rgba(255,255,255,.62);
+      border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); backdrop-filter: blur(14px);
+    }
+    .statGrid { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+    .stat {
+      padding: 18px; border-radius: 20px; background: #fff; border: 1px solid var(--line);
+      min-height: 122px;
+    }
+    .stat b { display:block; font-size: 2.15rem; letter-spacing: -.05em; color: var(--brand); }
+    .stat span { display:block; color: var(--muted); font-weight: 650; margin-top: 6px; }
+    .note {
+      margin-top: 12px; padding: 14px 15px; border-radius: 18px; background: rgba(242,140,56,.12);
+      color: #5c3a1c; line-height:1.45; border: 1px solid rgba(242,140,56,.22);
+    }
+    main { padding: 36px 0 70px; }
+    section { margin: 40px 0; }
+    .sectionTitle {
+      display:flex; align-items:end; justify-content:space-between; gap: 20px; margin-bottom: 18px;
+    }
+    h2 { margin:0; font-size: clamp(1.6rem, 3vw, 2.6rem); letter-spacing:-.055em; }
+    .sectionTitle p { margin: 0; color: var(--muted); max-width: 640px; line-height: 1.55; }
+    .toolbar {
+      position: sticky; top: 0; z-index: 5; margin: 26px 0 18px;
+      background: rgba(255,253,248,.88); border: 1px solid rgba(34,38,41,.1); border-radius: 24px;
+      box-shadow: 0 10px 28px rgba(28,37,44,.08); padding: 14px; backdrop-filter: blur(14px);
+    }
+    .searchRow { display:grid; grid-template-columns: 1fr auto; gap: 12px; align-items:center; }
+    input[type="search"], select {
+      width: 100%; border: 1px solid var(--line); background: white; border-radius: 18px; padding: 14px 16px;
+      font: inherit; outline: none;
+    }
+    input[type="search"]:focus, select:focus, .chip:focus { box-shadow: 0 0 0 4px rgba(12,124,138,.14); border-color: var(--brand4); }
+    .chips { display:flex; flex-wrap:wrap; gap: 8px; margin-top: 12px; }
+    .chip {
+      border: 1px solid var(--line); background: white; border-radius: 999px; padding: 9px 12px; cursor:pointer;
+      font-weight: 800; color: #49433d;
+    }
+    .chip.active { background: var(--brand); color: white; border-color: var(--brand); }
+    .resultsMeta { display:flex; justify-content:space-between; gap: 12px; color: var(--muted); font-weight: 750; margin: 12px 3px; }
+    .grid { display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; align-items: stretch; }
+    .card {
+      background: rgba(255,253,248,.92); border: 1px solid rgba(34,38,41,.11); border-radius: var(--radius);
+      padding: 18px; box-shadow: 0 12px 30px rgba(28,37,44,.07); display:flex; flex-direction:column; gap: 14px;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+    .card:hover { transform: translateY(-3px); box-shadow: var(--shadow); border-color: rgba(24,78,75,.24); }
+    .cardTop { display:flex; justify-content:space-between; gap: 12px; align-items:flex-start; }
+    .schoolIcon {
+      flex: 0 0 auto; width: 48px; height: 48px; border-radius: 17px; display:grid; place-items:center; font-size: 22px;
+      background: linear-gradient(135deg, rgba(24,78,75,.12), rgba(242,140,56,.16));
+      border: 1px solid var(--line);
+    }
+    h3 { margin:0; font-size: 1.25rem; line-height:1.1; letter-spacing:-.035em; }
+    .category { color: var(--brand4); font-weight: 850; margin-top: 5px; font-size:.92rem; }
+    .pills { display:flex; flex-wrap:wrap; gap: 7px; }
+    .pill {
+      display:inline-flex; align-items:center; gap: 5px; padding: 7px 9px; border-radius: 999px;
+      background: rgba(24,78,75,.07); color: var(--brand); font-weight: 800; font-size:.82rem;
+      border: 1px solid rgba(24,78,75,.09);
+    }
+    .pill.level { background: rgba(123,97,255,.10); color:#44339e; border-color: rgba(123,97,255,.12); }
+    .card p { margin:0; line-height:1.52; color:#48413b; }
+    .mini { color: var(--muted); font-size:.94rem; line-height:1.45; }
+    .cardActions { margin-top:auto; display:flex; flex-wrap:wrap; gap: 8px; }
+    .smallBtn {
+      border: 1px solid var(--line); background:#fff; border-radius: 999px; padding: 9px 11px; font-weight:850;
+      cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:6px; color: var(--brand);
+    }
+    .smallBtn.compare.active { background: var(--brand2); color:#2f1e0e; border-color: rgba(242,140,56,.35); }
+    details {
+      border-top: 1px dashed var(--line); padding-top: 10px;
+    }
+    summary { cursor:pointer; font-weight: 850; color: var(--brand); }
+    .detailList { margin: 10px 0 0; padding:0; list-style:none; display:grid; gap:7px; }
+    .detailList li { color:#524b44; line-height:1.4; }
+    .compareBar {
+      position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
+      width: min(900px, calc(100% - 28px)); background: #182321; color: white;
+      border-radius: 24px; box-shadow: 0 18px 50px rgba(0,0,0,.24);
+      padding: 12px 14px; z-index: 20; display:none; align-items:center; justify-content:space-between; gap: 12px;
+    }
+    .compareBar.show { display:flex; }
+    .compareBar span { font-weight: 800; }
+    .compareBar button { background:white; color:#182321; }
+    .modalBackdrop {
+      position: fixed; inset: 0; background: rgba(24,35,33,.44); display:none; place-items:center; z-index: 30; padding: 20px;
+    }
+    .modalBackdrop.show { display:grid; }
+    .modal {
+      width: min(1000px, 100%); max-height: min(86vh, 900px); overflow:auto;
+      background: var(--paper); border-radius: 28px; padding: 20px; box-shadow: 0 25px 70px rgba(0,0,0,.35);
+    }
+    .modalHead { display:flex; justify-content:space-between; align-items:center; gap: 12px; margin-bottom: 12px; }
+    .modalHead button { border:0; background:#eee5db; border-radius: 999px; padding: 10px 12px; font-weight:900; cursor:pointer; }
+    .compareTable { width:100%; border-collapse: collapse; min-width: 700px; }
+    .compareTable th, .compareTable td { text-align:left; vertical-align:top; padding: 13px; border-bottom: 1px solid var(--line); }
+    .compareTable th { background: rgba(24,78,75,.08); color: var(--brand); }
+    .quiz {
+      display:grid; grid-template-columns: .78fr 1.22fr; gap: 18px; align-items:start;
+    }
+    .quizPanel, .guideCard, .sourceBox {
+      background: rgba(255,253,248,.9); border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 20px; box-shadow: 0 12px 30px rgba(28,37,44,.06);
+    }
+    .question { margin-bottom: 18px; }
+    .question label { display:block; font-weight: 900; margin-bottom: 8px; }
+    .quizResults { display:grid; gap: 12px; }
+    .match {
+      padding: 15px; background:white; border: 1px solid var(--line); border-radius: 20px;
+      display:flex; justify-content:space-between; gap:12px; align-items:flex-start;
+    }
+    .score {
+      flex: 0 0 auto; width: 52px; height: 52px; border-radius: 18px; display:grid; place-items:center;
+      background: rgba(24,78,75,.1); color: var(--brand); font-weight: 950;
+    }
+    .guideGrid { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
+    .guideCard h3 { margin-bottom: 8px; }
+    .guideCard ul { margin: 10px 0 0; padding-left: 20px; color: #4c453e; line-height:1.55; }
+    .sourceBox {
+      color: #4d463f;
+      line-height: 1.55;
+    }
+    .sourceBox ul { columns: 2; column-gap: 36px; padding-left: 18px; }
+    .sourceBox li { break-inside: avoid; margin-bottom: 6px; }
+    footer {
+      padding: 32px 0 44px; border-top: 1px solid var(--line); color: var(--muted);
+    }
+    .empty {
+      padding: 40px; border: 1px dashed rgba(24,78,75,.3); border-radius: var(--radius); text-align:center;
+      background: rgba(255,255,255,.55); color: var(--muted); font-weight: 800; grid-column: 1 / -1;
+    }
+    @media (max-width: 980px) {
+      .hero, .quiz { grid-template-columns: 1fr; }
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .guideGrid { grid-template-columns: 1fr; }
+      .sourceBox ul { columns: 1; }
+    }
+    @media (max-width: 660px) {
+      .wrap { width: min(100% - 22px, var(--max)); }
+      nav { align-items:flex-start; flex-direction:column; margin-bottom: 34px; }
+      .grid { grid-template-columns: 1fr; }
+      .statGrid { grid-template-columns: 1fr 1fr; }
+      .searchRow { grid-template-columns: 1fr; }
+      .compareBar { align-items:flex-start; flex-direction:column; }
+      h1 { font-size: clamp(2.15rem, 14vw, 4rem); }
+      .toolbar { top: 6px; }
+    }
+    @media print {
+      .toolbar, .heroActions, .compareBar, .modalBackdrop, .smallBtn.compare, nav .links { display:none !important; }
+      body { background:white; }
+      .card, .quizPanel, .guideCard, .sourceBox { box-shadow:none; break-inside: avoid; }
+      .grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#scholen">Sla navigatie over</a>
+  <header>
+    <div class="wrap">
+      <nav aria-label="Hoofdnavigatie">
+        <div class="logo"><span class="logoMark">G</span><span>Schoolkeuze Groningen</span></div>
+        <div class="links">
+          <a href="#scholen">Scholen</a>
+          <a href="#keuzehulp">Keuzehulp</a>
+          <a href="#vragen">Vragenlijst</a>
+          <a href="#bronnen">Bronnen</a>
+        </div>
+      </nav>
+
+      <div class="hero">
+        <div>
+          <span class="eyebrow">✨ Interactieve gids voor groep 8, ouders en mentoren</span>
+          <h1>Kies een middelbare school die echt past.</h1>
+          <p>
+            Vergelijk de grote middelbare scholen in Groningen, Haren en het directe schoolkeuzegebied.
+            Filter op advies, onderwijsstijl, ondersteuning en interesses zoals sport, techniek, kunst,
+            tweetalig onderwijs of praktijkgericht leren.
+          </p>
+          <div class="heroActions">
+            <a class="btn" href="#scholen">Start met vergelijken</a>
+            <a class="btn secondary" href="#vragen">Doe de snelle match</a>
+          </div>
+        </div>
+        <aside class="heroPanel" aria-label="Samenvatting">
+          <div class="statGrid">
+            <div class="stat"><b>27</b><span>scholen / locaties in de gids</span></div>
+            <div class="stat"><b>10+</b><span>filters voor niveau en profiel</span></div>
+            <div class="stat"><b>3</b><span>scholen tegelijk vergelijken</span></div>
+            <div class="stat"><b>100%</b><span>zelfstandig: geen externe scripts</span></div>
+          </div>
+          <div class="note">
+            Laatst handmatig gecontroleerd: <strong>18 juni 2026</strong>. Gebruik deze site als startpunt:
+            bezoek altijd ook de open dag en de officiële schoolsite.
+          </div>
+        </aside>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="scholen">
+      <div class="sectionTitle">
+        <div>
+          <h2>Alle scholen in één overzicht</h2>
+          <p>De lijst volgt het regionale schoolkeuze-overzicht van Scholenmarkt Groningen. Eelde en Winsum staan erin als regio-opties voor Groningse gezinnen.</p>
+        </div>
+      </div>
+
+      <div class="toolbar" aria-label="Filters">
+        <div class="searchRow">
+          <input id="search" type="search" placeholder="Zoek op school, niveau, profiel, buurt of interesse…" aria-label="Zoeken">
+          <select id="sort" aria-label="Sorteren">
+            <option value="name">Sorteer: naam A-Z</option>
+            <option value="city">Sorteer: plaats</option>
+            <option value="category">Sorteer: type school</option>
+          </select>
+        </div>
+        <div class="chips" id="chips" aria-label="Snelle filters"></div>
+      </div>
+
+      <div class="resultsMeta">
+        <span id="count"></span>
+        <span>Tip: klik “vergelijk” bij maximaal drie scholen.</span>
+      </div>
+
+      <div class="grid" id="cards"></div>
+    </section>
+
+    <section id="keuzehulp">
+      <div class="sectionTitle">
+        <div>
+          <h2>Waar let je op?</h2>
+          <p>Een goede keuze is niet alleen “het hoogste niveau”. Sfeer, begeleiding, reistijd en leerstijl zijn vaak minstens zo belangrijk.</p>
+        </div>
+      </div>
+      <div class="guideGrid">
+        <article class="guideCard">
+          <h3>1. Past het niveau én de route?</h3>
+          <p>Check of er dakpanklassen, brede brugklassen of doorstroommogelijkheden zijn als je kind nog groeit in niveau.</p>
+          <ul>
+            <li>Vmbo-bb/kb/tl, havo, vwo of gymnasium?</li>
+            <li>Breed starten of meteen categoriaal?</li>
+            <li>Hoe gaat op- of afstromen?</li>
+          </ul>
+        </article>
+        <article class="guideCard">
+          <h3>2. Past de leerstijl?</h3>
+          <p>Een leerling die graag onderzoekt, doet of zelfstandig plant, kan op een andere school beter tot bloei komen dan een leerling die veel structuur wil.</p>
+          <ul>
+            <li>Montessori, dalton, vrijeschool of klassiek?</li>
+            <li>Veel praktijk of vooral theorie?</li>
+            <li>Projecten, sport, kunst, techniek?</li>
+          </ul>
+        </article>
+        <article class="guideCard">
+          <h3>3. Past de begeleiding?</h3>
+          <p>Vraag door naar mentoren, leerlingcoaches, dyslexie/rekenhulp, rustgroepen, ondersteuning en contact met ouders.</p>
+          <ul>
+            <li>Kleine klassen of grote school?</li>
+            <li>Extra ondersteuning nodig?</li>
+            <li>Hoe snel is er contact bij zorgen?</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section id="vragen">
+      <div class="sectionTitle">
+        <div>
+          <h2>Snelle match</h2>
+          <p>Beantwoord drie vragen. De match is géén advies, maar helpt om gericht open dagen te kiezen.</p>
+        </div>
+      </div>
+      <div class="quiz">
+        <form class="quizPanel" id="quizForm">
+          <div class="question">
+            <label for="qLevel">Welk advies past het best?</label>
+            <select id="qLevel">
+              <option value="">Maakt niet uit / nog breed oriënteren</option>
+              <option value="praktijkonderwijs">Praktijkonderwijs</option>
+              <option value="vmbo">Vmbo</option>
+              <option value="vmbo-tl">Vmbo-tl / mavo</option>
+              <option value="havo">Havo</option>
+              <option value="vwo">Vwo / atheneum</option>
+              <option value="gymnasium">Gymnasium</option>
+            </select>
+          </div>
+          <div class="question">
+            <label for="qStyle">Welke leerstijl klinkt fijn?</label>
+            <select id="qStyle">
+              <option value="">Geen voorkeur</option>
+              <option value="structuur">Duidelijke structuur en begeleiding</option>
+              <option value="zelfstandig">Zelfstandig werken / eigen keuzes</option>
+              <option value="praktijk">Veel doen en praktijk</option>
+              <option value="onderzoek">Onderzoeken en ontwerpen</option>
+              <option value="creatief">Kunst, cultuur en creativiteit</option>
+            </select>
+          </div>
+          <div class="question">
+            <label for="qInterest">Wat wil je extra kunnen ontdekken?</label>
+            <select id="qInterest">
+              <option value="">Geen voorkeur</option>
+              <option value="sport">Sport / topsport</option>
+              <option value="techniek">Techniek / science / ontwerpen</option>
+              <option value="tweetalig">Tweetalig of internationaal</option>
+              <option value="groen">Natuur, dier, voeding of groen</option>
+              <option value="ondersteuning">Extra ondersteuning of kleine setting</option>
+              <option value="klassiek">Latijn, Grieks of klassieke vorming</option>
+            </select>
+          </div>
+          <button type="button" class="btn" id="matchBtn">Toon passende scholen</button>
+        </form>
+        <div class="quizPanel">
+          <h3>Jouw topmatches</h3>
+          <div class="quizResults" id="quizResults">
+            <p class="mini">Kies links je voorkeuren en klik op “Toon passende scholen”.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="bronnen">
+      <div class="sectionTitle">
+        <div>
+          <h2>Bronnen en controle</h2>
+          <p>De gegevens zijn samengevat uit publieke schoolinformatie. Controleer aanmeldtermijnen, open dagen en plaatsingsregels altijd op de officiële schoolsite.</p>
+        </div>
+      </div>
+      <div class="sourceBox">
+        <p><strong>Belangrijk:</strong> deze website is bedoeld als keuzehulp, niet als officiële ranglijst of toelatingsadvies. Sommige scholen hebben specifieke toelatings- of ondersteuningsroutes.</p>
+        <ul id="sourceList"></ul>
+      </div>
+    </section>
+  </main>
+
+  <div class="compareBar" id="compareBar" role="region" aria-live="polite">
+    <span id="compareText">0 scholen geselecteerd</span>
+    <div>
+      <button class="smallBtn" id="openCompare">Vergelijk</button>
+      <button class="smallBtn" id="clearCompare">Wis</button>
+    </div>
+  </div>
+
+  <div class="modalBackdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <div class="modalHead">
+        <h2 id="modalTitle">Scholen vergelijken</h2>
+        <button id="closeModal" aria-label="Sluit vergelijking">✕</button>
+      </div>
+      <div style="overflow:auto">
+        <table class="compareTable" id="compareTable"></table>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="wrap">
+      <strong>Schoolkeuze Groningen</strong> · Zelfstandige HTML-pagina · Gemaakt voor ouders en kinderen die willen vergelijken zonder verdwaald te raken in losse sites.
+    </div>
+  </footer>
+
+  <script>
+    const schools = [
+  {
+    "name": "CSG Augustinus",
+    "category": "Breed regulier",
+    "city": "Groningen",
+    "address": "Admiraal de Ruyterlaan 37, 9726 GP Groningen",
+    "phone": "050 313 9720",
+    "email": "info@csgaugustinus.nl",
+    "website": "https://www.csgaugustinus.nl",
+    "source": "https://www.scholenmarktgroningen.nl/scholen-in-groningen/csg-augustinus",
+    "levels": [
+      "vmbo-tl",
+      "havo",
+      "atheneum/vwo"
+    ],
+    "identity": "Christelijk",
+    "profile": "Vmbo-tl, havo en atheneum onder één dak. Talentstromen, brede brugklassen/dakpanklassen, mentoraat en extra taaluitdaging zoals Cambridge/Goethe.",
+    "bestFor": "Leerlingen die een brede school willen met doorstroommogelijkheden en veel keuze in talentontwikkeling.",
+    "tags": [
+      "christelijk",
+      "breed",
+      "talent",
+      "talen",
+      "doorstroom",
+      "kunst",
+      "sport",
+      "science",
+      "vmbo-tl",
+      "havo",
+      "vwo"
+    ]
+  },
+  {
+    "name": "CSG Kluiverboom",
+    "category": "Vmbo praktijkgericht",
+    "city": "Groningen",
+    "address": "Kluiverboom 1, 9732 KZ Groningen",
+    "phone": "050 571 0195",
+    "email": "info@csgkluiverboom.nl",
+    "website": "https://www.csgkluiverboom.nl",
+    "source": "https://www.scholenmarktgroningen.nl/scholen-in-groningen/csg-kluiverboom",
+    "levels": [
+      "vmbo-bb",
+      "vmbo-kb",
+      "vmbo-tl"
+    ],
+    "identity": "Christelijk",
+    "profile": "Kleine vmbo-school met veel structuur, mentorbegeleiding, praktijklokalen en profielen zoals Zorg & Welzijn en Produceren, Installeren & Energie.",
+    "bestFor": "Leerlingen die vmbo willen doen in een overzichtelijke school met duidelijke begeleiding en veel praktijk.",
+    "tags": [
+      "christelijk",
+      "vmbo",
+      "praktijk",
+      "techniek",
+      "zorg",
+      "kleinschalig",
+      "ondersteuning",
+      "vmbo-bb",
+      "vmbo-kb",
+      "vmbo-tl"
+    ]
+  },
+  {
+    "name": "CSG Selion",
+    "category": "Vmbo met extra structuur",
+    "city": "Groningen",
+    "address": "Diamantlaan 14, 9743 BG Groningen",
+    "phone": "050 571 8544",
+    "email": "info@csgselion.nl",
+    "website": "https://www.csgselion.nl",
+    "source": "https://www.scholenmarktgroningen.nl/scholen-in-groningen/csg-selion",
+    "levels": [
+      "vmbo-bb",
+      "vmbo-kb",
+      "vmbo-tl"
+    ],
+    "identity": "Christelijk",
+    "profile": "Vmbo-bb, -kb en -tl met regulier onderwijs en facetgroepen voor extra rust, structuur en ondersteuning.",
+    "bestFor": "Leerlingen die praktisch willen leren en mogelijk baat hebben bij kleinere, rustige groepen.",
+    "tags": [
+      "christelijk",
+      "vmbo",
+      "praktijk",
+      "ondersteuning",
+      "facetgroepen",
+      "kleine groepen",
+      "zorg",
+      "techniek",
+      "vmbo-bb",
+      "vmbo-kb",
+      "vmbo-tl"
+    ]
+  },
+  {
+    "name": "CSG Wessel Gansfort",
+    "category": "Breed regulier",
+    "city": "Groningen",
+    "address": "Heerdenpad 8, 9731 BW Groningen",
+    "phone": "050 541 0656",
+    "email": "opendagen@csgwesselgansfort.nl",
+    "website": "https://www.csgwesselgansfort.nl",
+    "source": "https://www.scholenmarktgroningen.nl/scholen-in-groningen/csg-wessel-gansfort",
+    "levels": [
+      "vmbo-tl",
+      "havo",
+      "atheneum/vwo"
+    ],
+    "identity": "Christelijk",
+    "profile": "Vmbo-tl, havo en atheneum met brede brugklassen, CultuurProfielSchool, Vecon Business School, sportmogelijkheden en Technologie & Toepassing.",
+    "bestFor": "Leerlingen die willen kiezen tussen cultuur, ondernemen, sport of techniek binnen een brede school.",
+    "tags": [
+      "christelijk",
+      "breed",
+      "cultuur",
+      "business",
+      "ondernemen",
+      "sport",
+      "techniek",
+      "vmbo-tl",
+      "havo",
+      "vwo"
+    ]
+  },
+  {
+    "name": "Gomarus College Magnolia",
+    "category": "Onderbouw alle niveaus",
+    "city": "Groningen",
+    "address": "Magnoliastraat 1, 9741 CS Groningen",
+    "phone": "050 571 3093",
+    "email": "magnolia@gomaruscollege.nl",
+    "website": "https://gomaruscollege.nl/locaties/groningen-magnoliastraat/",
+    "source": "https://www.scholenmarktgroningen.nl/scholen-in-groningen/gomarus-college-magnolia",
+    "levels": [
+      "vmbo-bb",
+      "vmbo-kb",
+      "vmbo-tl",
+      "havo",
+      "vwo"
+    ],
+    "identity": "Christelijk gereformeerd",
+    "profile": "Kleinschalige onderbouwlocatie bij het Noorderstation voor alle niveaus; tussenuurvrij, veel structuur, christelijke identiteit en extra verbreding.",
+    "bestFor": "Leerlingen die de overstap naar de brugklas in een kleinere, gestructureerde onderbouwlocatie willen maken.",
+    "tags": [
+      "christelijk",
+      "onderbouw",
+      "kleinschalig",
+      "structuur",
+      "ondersteuning",
+      "alle niveaus",
+      "vmbo",
+      "havo",
+      "vwo"
+    ]
+  },
+  {
+    "name": "Gomarus College Praktijkonderwijs",
+    "category": "Praktijkonderwijs",
+    "city": "Groningen",
+    "address": "Lavendelweg 7, 9731 HR Groningen",
+    "phone": "050 524 4515",
+    "email": "praktijkonderwijs@gomaruscollege.nl",
+    "website": "https://gomaruscollege.nl/",
+    "source": "https://www.scholenmarktgroningen.nl/scholen-in-groningen/gomarus-college-praktijkonderwijs",
+    "levels": [
+      "praktijkonderwijs"
+    ],
+    "identity": "Christelijk gereformeerd",
+    "profile": "Praktijkonderwijs leerjaar 1 t/m 6 met leren door te doen, praktijkruimtes, stagevoorbereiding en een schakelklas richting vmbo.",
+    "bestFor": "Leerlingen die praktisch leren op eigen tempo en willen toewerken naar werk of mbo.",
+    "tags": [
+      "christelijk",
+      "praktijkonderwijs",
+      "praktijk",
+      "stage",
+      "kleinschalig",
+      "ondersteuning",
+      "mbo"
+    ]
+  },
+  {
+    "name": "Gomarus College Vondelpad 3",
+    "category": "Havo/vwo onderbouw",
+    "city": "Groningen",
+    "address": "Vondelpad 3, 9721 LX Groningen",
+    "phone": "050 524 4575",
+    "email": "onderbouw@gomaruscollege.nl",
+    "website": "https://gomaruscollege.nl/",
+    "source": "https://www.scholenmarktgroningen.nl/scholen-in-groningen/gomarus-college-vondelpad-3",
+    "levels": [
+      "havo",
+      "atheneum/vwo",
+      "gymnasium"
+    ],
+    "identity": "Christelijk gereformeerd",
+    "profile": "Havo en vwo-onderbouw, met atheneum/gymnasium en tto voor vwo; aandacht voor persoonlijke begeleiding, 20-80 Junior Learning en extra uitdaging.",
+    "bestFor": "Leerlingen met havo- of vwo-advies die christelijk onderwijs, TTO-optie en extra verbreding zoeken.",
+    "tags": [
+      "christelijk",
+      "havo",
+      "vwo",
+      "gymnasium",
+      "tto",
+      "onderbouw",
+      "uitdaging",
+      "20-80 learning"
+    ]
+  },
+  {
+    "name": "Gomarus College Vondelpad 2",
+    "category": "Vmbo/havo praktijkgericht",
+    "city": "Groningen",
+    "address": "Vondelpad 2, 9721 LX Groningen",
+    "phone": "050 524 4540",
+    "email": "vmbo@gomaruscollege.nl",
+    "website": "https://gomaruscollege.nl/",
+    "source": "https://www.scholenmarktgroningen.nl/scholen-in-groningen/gomarus-college-vondelpad-2",
+    "levels": [
+      "vmbo-bb",
+      "vmbo-kb",
+      "vmbo-gl",
+      "havo"
+    ],
+    "identity": "Christelijk gereformeerd",
+    "profile": "Vakcollege, VakMavo en VakHavo: praktijkgericht leren met techniek, verzorging, ondernemen en doorstroommogelijkheden.",
+    "bestFor": "Leerlingen die vmbo of havo willen combineren met praktisch leren.",
+    "tags": [
+      "christelijk",
+      "praktijk",
+      "vakcollege",
+      "vakmavo",
+      "vakhavo",
+      "techniek",
+      "zorg",
+      "ondernemen",
+      "vmbo",
+      "havo"
+    ]
+  },
+  {
+    "name": "Harens Lyceum",
+    "category": "Havo/vwo",
+    "city": "Haren",
+    "address": "Kerklaan 39, 9751 NL Haren",
+    "phone": "050 321 0560",
+    "email": "",
+    "website": "https://www.harenslyceum.nl",
+    "source": "https://www.scholenmarktgroningen.nl/scholen-in-groningen/harens-lyceum",
+    "levels": [
+      "havo",
+      "atheneum/vwo",
+      "atheneum plus"
+    ],
+    "identity": "Openbaar",
+    "profile": "Havo, atheneum en atheneum plus met Technasium, CultuurProfielSchool, DaMu-mogelijkheden, Sport & Gezondheid en Ondernemen.",
+    "bestFor": "Leerlingen met havo/vwo-advies die graag kiezen uit techniek, cultuur, sport of ondernemerschap.",
+    "tags": [
+      "openbaar",
+      "havo",
+      "vwo",
+      "technasium",
+      "cultuur",
+      "sport",
+      "ondernemen",
+      "atheneum plus",
+      "dumu",
+      "muziek"
+    ]
+  },
+  {
+    "name": "Heyerdahl College",
+    "category": "Praktijkonderwijs",
+    "city": "Groningen",
+    "address": "Kluiverboom 1b, 9732 KZ Groningen",
+    "phone": "050 321 0525",
+    "email": "info.heyerdahlcollege@o2g2.nl",
+    "website": "https://www.heyerdahlcollege.nl",
+    "source": "https://www.scholenmarktgroningen.nl/scholen-in-groningen/heyerdahl-college",
+    "levels": [
+      "praktijkonderwijs"
+    ],
+    "identity": "Openbaar",
+    "profile": "Praktijkonderwijs met veel leren door te doen, sectorvakken, stage vanaf de derde klas en een PrO-vmbo-klas samen met Werkman VMBO.",
+    "bestFor": "Leerlingen die praktijkonderwijs zoeken met duidelijke routes richting werk of mbo.",
+    "tags": [
+      "openbaar",
+      "praktijkonderwijs",
+      "praktijk",
+      "stage",
+      "ondersteuning",
+      "pro-vmbo",
+      "mbo"
+    ]
+  },
+  {
+    "name": "Kamerlingh Onnes",
+    "category": "Breed regulier",
+    "city": "Groningen",
+    "address": "Eikenlaan 286, 9741 EW Groningen",
+    "phone": "050 321 0610",
+    "email": "info.kamerlinghonnes@o2g2.nl",
+    "website": "https://www.kamerlinghonnes.nl",
+    "source": "https://www.scholenmarktgroningen.nl/scholen-in-groningen/kamerlingh-onnes",
+    "levels": [
+      "vmbo-tl",
+      "havo",
+      "atheneum/vwo",
+      "atheneum plus"
+    ],
+    "identity": "Openbaar",
+    "profile": "Vmbo-tl, havo en atheneum(+) onder één dak; dakpanklassen, atheneum+ onderzoeksklas en Talentvakken rond doen, ondernemen en onderzoeken.",
+    "bestFor": "Leerlingen die breed willen starten en houden van talentvakken, onderzoek en doorstroommogelijkheden.",
+    "tags": [
+      "openbaar",
+      "breed",
+      "onderzoek",
+      "talent",
+      "atheneum plus",
+      "doorstroom",
+      "vmbo-tl",
+      "havo",
+      "vwo"
+    ]
+  },
+  {
+    "name": "Leon van Gelder",
+    "category": "Vernieuwend breed",
+    "city": "Groningen",
+    "address": "Diamantlaan 27, 9743 BA Groningen",
+    "phone": "050 321 0625",
+    "email": "",
+    "website": "https://www.leonvangelder.nl",
+    "source": "https://www.scholenmarktgroningen.nl/scholen-in-groningen/leon-van-gelder",
+    "levels": [
+      "vmbo-bb",
+      "vmbo-kb",
+      "vmbo-gl",
+      "vmbo-tl",
+      "havo",
+      "vwo"
+    ],
+    "identity": "Openbaar",
+    "profile": "Vier jaar vaste klas, drie jaar geen cijfers, vakken op eigen niveau en veel doe-, denk- en creatieve vakken; doorstroom naar mbo, 4-havo of 4-atheneum.",
+    "bestFor": "Leerlingen die niet in één niveauhokje passen en baat hebben bij brede ontwikkeling zonder vroege selectie.",
+    "tags": [
+      "openbaar",
+      "vernieuwend",
+      "breed",
+      "geen cijfers",
+      "eigen niveau",
+      "kunst",
+      "media",
+      "havo",
+      "vwo",
+      "vmbo",
+      "ondersteuning"
+    ]
+  },
+  {
+    "name": "Maartenscollege Haren",
+    "category": "Internationaal tweetalig",
+    "city": "Haren",
+    "address": "Hemmenlaan 2, 9751 NS Haren",
+    "phone": "050 537 5200",
+    "email": "info@maartens.nl",
+    "website": "https://maartens.nl",
+    "source": "https://www.scholenmarktgroningen.nl/scholen-in-groningen/maartenscollege-haren",
+    "levels": [
+      "mavo/vmbo-tl",
+      "havo",
+      "vwo",
+      "IB/MYP"
+    ],
+    "identity": "Interconfessioneel",
+    "profile": "Internationaal tweetalig onderwijs op mavo-, havo- en vwo-niveau; combinatieklassen, Middle Years Programme en mogelijkheid richting IB Diploma Programme.",
+    "bestFor": "Leerlingen en ouders die tweetalig/internationaal onderwijs, projecten en brede wereldoriëntatie belangrijk vinden.",
+    "tags": [
+      "tweetalig",
+      "internationaal",
+      "IB",
+      "MYP",
+      "mavo",
+      "havo",
+      "vwo",
+      "projecten",
+      "wereldburgerschap"
+    ]
+  },
+  {
+    "name": "Montessori Lyceum Groningen",
+    "category": "Montessori havo/vwo",
+    "city": "Groningen",
+    "address": "Helper Brink 30, 9722 EP Groningen",
+    "phone": "050 321 0580",
+    "email": "info@montessorilyceumgroningen.nl",
+    "website": "https://www.montessorilyceumgroningen.nl",
+    "source": "https://www.scholenmarktgroningen.nl/scholen-in-groningen/montessori-lyceum-groningen",
+    "levels": [
+      "havo",
+      "havo/atheneum",
+      "atheneum plus"
+    ],
+    "identity": "Openbaar Montessori",
+    "profile": "Erkend montessoriprofiel voor havo en vwo: nieuwsgierigheid, samenwerken, ateliers, Geo Future School en brede ontwikkeling.",
+    "bestFor": "Zelfstandige, nieuwsgierige leerlingen die havo/vwo willen combineren met montessorionderwijs.",
+    "tags": [
+      "montessori",
+      "openbaar",
+      "havo",
+      "vwo",
+      "zelfstandig",
+      "ateliers",
+      "geo future",
+      "kunst",
+      "sport"
+    ]
+  },
+  {
+    "name": "Montessori Vaklyceum",
+    "category": "Montessori vmbo/havo",
+    "city": "Groningen",
+    "address": "Vondellaan 83, 9721 LD Groningen",
+    "phone": "050 321 0590",
+    "email": "info@montessorivaklyceum.nl",
+    "website": "https://montessorivaklyceum.nl",
+    "source": "https://www.scholenmarktgroningen.nl/scholen-in-groningen/montessori-vaklyceum-groningen",
+    "levels": [
+      "vmbo-bb",
+      "vmbo-kb",
+      "vmbo-tl",
+      "havo"
+    ],
+    "identity": "Openbaar Montessori",
+    "profile": "Vmbo-bb, -kb, -tl en havo met montessori-structuur, coaching en profielen Zorg & Welzijn, Economie & Ondernemen en Media, Vormgeving & ICT.",
+    "bestFor": "Leerlingen met vmbo- of havo-advies die praktijkgericht en zelfstandig willen groeien.",
+    "tags": [
+      "montessori",
+      "vmbo",
+      "havo",
+      "praktijk",
+      "coaching",
+      "MVI",
+      "economie",
+      "zorg",
+      "zelfstandig"
+    ]
+  },
+  {
+    "name": "Parcival College Vrijeschool",
+    "category": "Vrijeschool",
+    "city": "Groningen",
+    "address": "Merwedestraat 45/98 en Reggestraat 1, Groningen",
+    "phone": "050 520 1800",
+    "email": "info@parcivalcollege.nl",
+    "website": "https://www.parcivalcollege.nl",
+    "source": "https://www.scholenmarktgroningen.nl/scholen-in-groningen/parcival-college-vrijeschool",
+    "levels": [
+      "mavo/vmbo-tl",
+      "havo",
+      "vwo"
+    ],
+    "identity": "Vrijeschool / bijzonder",
+    "profile": "Vrijeschool met mavo, havo en vwo; leren met hoofd, hart en handen, periodeonderwijs, kunst, cultuur, ambacht en stages.",
+    "bestFor": "Leerlingen die een creatieve, brede vorming zoeken naast voorbereiding op het examen.",
+    "tags": [
+      "vrijeschool",
+      "mavo",
+      "havo",
+      "vwo",
+      "kunst",
+      "cultuur",
+      "ambacht",
+      "stage",
+      "creatief"
+    ]
+  },
+  {
+    "name": "Praedinius Gymnasium",
+    "category": "Gymnasium",
+    "city": "Groningen",
+    "address": "Turfsingel 82 & Kruitlaan 11, Groningen",
+    "phone": "050 321 0530",
+    "email": "info.praedinius@o2g2.nl",
+    "website": "https://praedinius.nl",
+    "source": "https://www.scholenmarktgroningen.nl/scholen-in-groningen/praedinius-gymnasium",
+    "levels": [
+      "gymnasium"
+    ],
+    "identity": "Openbaar",
+    "profile": "Categoraal gymnasium met klassieke talen, Technasium, begaafdheidsprofielschool, olympiadeschool, orkest, debat en breed vakkenaanbod.",
+    "bestFor": "Nieuwsgierige leerlingen met vwo-advies die klassieke talen, onderzoek en extra uitdaging willen.",
+    "tags": [
+      "openbaar",
+      "gymnasium",
+      "vwo",
+      "klassiek",
+      "technasium",
+      "hoogbegaafdheid",
+      "olympiade",
+      "onderzoek",
+      "uitdaging"
+    ]
+  },
+  {
+    "name": "Praktijkschool De Bolster",
+    "category": "Praktijkonderwijs",
+    "city": "Groningen",
+    "address": "Multatulistraat 91, 9721 NH Groningen",
+    "phone": "050 525 0110",
+    "email": "info@de-bolster.nl",
+    "website": "https://www.de-bolster.nl",
+    "source": "https://www.scholenmarktgroningen.nl/scholen-in-groningen/praktijkschool-de-bolster",
+    "levels": [
+      "praktijkonderwijs"
+    ],
+    "identity": "Christelijk",
+    "profile": "Praktijkonderwijs met kleine klassen, praktijklokalen, veel aandacht voor talentontwikkeling en leren op eigen niveau.",
+    "bestFor": "Leerlingen die makkelijker leren door te doen en persoonlijke begeleiding nodig hebben.",
+    "tags": [
+      "christelijk",
+      "praktijkonderwijs",
+      "praktijk",
+      "kleine klassen",
+      "talent",
+      "ondersteuning",
+      "stage"
+    ]
+  },
+  {
+    "name": "Prins Johan Frisoschool",
+    "category": "Voortgezet speciaal onderwijs",
+    "city": "Haren",
+    "address": "Dilgtplein 1, 9751 NJ Haren",
+    "phone": "050 321 0485",
+    "email": "administratie.pjf@o2g2.nl",
+    "website": "https://www.prinsjohanfrisoschool.nl",
+    "source": "https://www.scholenmarktgroningen.nl/scholen-in-groningen/prins-johan-frisoschool",
+    "levels": [
+      "praktijkonderwijs",
+      "vmbo-tl",
+      "havo",
+      "VSO"
+    ],
+    "identity": "Openbaar speciaal onderwijs",
+    "profile": "VSO voor leerlingen met extra zorgondersteuning; diplomagericht vmbo-tl/mavo of havo en arbeidsmarktgerichte/praktijkroute.",
+    "bestFor": "Leerlingen met een chronische ziekte, lichamelijke beperking of andere ondersteuningsvraag die diplomagericht of praktijkgericht onderwijs zoeken.",
+    "tags": [
+      "vso",
+      "ondersteuning",
+      "zorg",
+      "medisch",
+      "kleine klassen",
+      "praktijkonderwijs",
+      "vmbo-tl",
+      "havo"
+    ]
+  },
+  {
+    "name": "Simon van Hasseltschool",
+    "category": "Schakel / 10-14",
+    "city": "Groningen",
+    "address": "Travertijnstraat 2, 9743 SZ Groningen",
+    "phone": "050 321 0635",
+    "email": "info.simonvanhasselt@o2g2.nl",
+    "website": "https://simonvanhasselt.nl",
+    "source": "https://www.scholenmarktgroningen.nl/scholen-in-groningen/simon-van-hasselt",
+    "levels": [
+      "vmbo-bb",
+      "vmbo-kb",
+      "vmbo-gl",
+      "vmbo-tl"
+    ],
+    "identity": "Openbaar",
+    "profile": "10-14/schakelschool met vmbo-bb, -kb, -gl en -tl inclusief ondersteuning; extra aandacht voor taal, rekenen, concentratie en overgang naar vmbo.",
+    "bestFor": "Leerlingen die nog niet klaar zijn voor een grote brugklas en extra tijd/steun nodig hebben.",
+    "tags": [
+      "openbaar",
+      "schakel",
+      "10-14",
+      "ondersteuning",
+      "vmbo",
+      "kleine klassen",
+      "taal",
+      "rekenen"
+    ]
+  },
+  {
+    "name": "Stadslyceum",
+    "category": "Havo/vwo",
+    "city": "Groningen",
+    "address": "Nieuwe Sint Jansstraat 11, 9711 VG Groningen",
+    "phone": "050 321 0500",
+    "email": "intake.stadslyceum@o2g2.nl",
+    "website": "https://stadslyceum.nl",
+    "source": "https://www.scholenmarktgroningen.nl/scholen-in-groningen/stadslyceum",
+    "levels": [
+      "havo",
+      "vwo",
+      "atheneum plus"
+    ],
+    "identity": "Openbaar",
+    "profile": "Binnenstadschool voor havo, vwo en atheneum plus; lyceumklas met Latijn, Technasium en Cultuurprofielschool.",
+    "bestFor": "Leerlingen die havo/vwo willen in de binnenstad, met techniek en cultuur in een ambitieus profiel.",
+    "tags": [
+      "openbaar",
+      "havo",
+      "vwo",
+      "lyceum",
+      "latin",
+      "technasium",
+      "cultuur",
+      "binnenstad",
+      "atheneum plus"
+    ]
+  },
+  {
+    "name": "Terra Eelde",
+    "category": "Groen vmbo / regio",
+    "city": "Eelde",
+    "address": "Burgemeester Legroweg 29, 9761 TA Eelde",
+    "phone": "050 309 1625",
+    "email": "eelde@voterra.nl",
+    "website": "https://eelde.voterra.nl/terra-eelde",
+    "source": "https://www.scholenmarktgroningen.nl/scholen-in-groningen/terra-eelde",
+    "levels": [
+      "vmbo-bb",
+      "vmbo-kb",
+      "vmbo-gl",
+      "vmbo-tl",
+      "Groene Lyceum"
+    ],
+    "identity": "Groen onderwijs",
+    "profile": "Vmbo-groen en Het Groene Lyceum in Eelde; kleine school met praktijk rond natuur, dier, voeding, techniek en gezondheid.",
+    "bestFor": "Leerlingen uit Groningen/Haren/regio die groen, praktisch en kleinschalig willen leren.",
+    "tags": [
+      "regio",
+      "groen",
+      "vmbo",
+      "groene lyceum",
+      "praktijk",
+      "dieren",
+      "natuur",
+      "techniek",
+      "kleinschalig"
+    ]
+  },
+  {
+    "name": "Terra Winsum",
+    "category": "Groen vmbo / regio",
+    "city": "Winsum",
+    "address": "Hamrik 4A en Onderdendamsterweg 43A, Winsum",
+    "phone": "0595 447 070",
+    "email": "winsum@voterra.nl / winsum@pro.terra.nl",
+    "website": "https://winsum.voterra.nl",
+    "source": "https://www.scholenmarktgroningen.nl/scholen-in-groningen/terra-winsum",
+    "levels": [
+      "vmbo-bb",
+      "vmbo-kb",
+      "vmbo-gl",
+      "Groene Lyceum",
+      "praktijkonderwijs"
+    ],
+    "identity": "Groen onderwijs",
+    "profile": "Vmbo-groen, Groene Lyceum en praktijkonderwijs; praktische groene vakken, LWOO/extra begeleiding en schoolbus/OV-bereikbaarheid.",
+    "bestFor": "Leerlingen uit de regio die groen onderwijs willen met praktijk, begeleiding en keuze tussen vmbo, Groene Lyceum of PrO.",
+    "tags": [
+      "regio",
+      "groen",
+      "vmbo",
+      "groene lyceum",
+      "praktijkonderwijs",
+      "lwoo",
+      "praktijk",
+      "dieren",
+      "natuur"
+    ]
+  },
+  {
+    "name": "Topsport Talentschool Groningen",
+    "category": "Sport / dalton",
+    "city": "Groningen",
+    "address": "Melisseweg 2, 9731 BX Groningen",
+    "phone": "050 321 0515",
+    "email": "sportcoordinatie.tts@o2g2.nl",
+    "website": "https://www.topsporttalentschoolgroningen.nl",
+    "source": "https://www.scholenmarktgroningen.nl/scholen-in-groningen/topsport-talentschool-groningen",
+    "levels": [
+      "vmbo-tl",
+      "havo",
+      "vwo"
+    ],
+    "identity": "Openbaar / dalton",
+    "profile": "School voor talentvolle en sportieve leerlingen; vmbo-tl, havo en vwo met roostermaatwerk, sportcoördinatie, daltonuren en SportLifeStyle.",
+    "bestFor": "Sporters of sportieve leerlingen die onderwijs en trainingen goed moeten combineren.",
+    "tags": [
+      "openbaar",
+      "sport",
+      "topsport",
+      "dalton",
+      "maatwerk",
+      "vmbo-tl",
+      "havo",
+      "vwo",
+      "sportlifestyle"
+    ]
+  },
+  {
+    "name": "VSO Dunk",
+    "category": "Voortgezet speciaal onderwijs",
+    "city": "Groningen",
+    "address": "Radiumstraat 2A, 9743 SP Groningen",
+    "phone": "050 321 0489",
+    "email": "vsodunk@o2g2.nl",
+    "website": "https://www.vsodunk.nl",
+    "source": "https://www.scholenmarktgroningen.nl/scholen-in-groningen/vso-dunk-2",
+    "levels": [
+      "VSO",
+      "cluster 3"
+    ],
+    "identity": "Openbaar speciaal onderwijs",
+    "profile": "VSO cluster 3 met kleine klassen, persoonlijke ondersteuning, theorie- en praktijkonderwijs en uitstroom naar dagbesteding, beschut werk, arbeid of entree-mbo.",
+    "bestFor": "Leerlingen die veel ondersteuning nodig hebben en richting zelfredzaamheid, werk of entree-mbo willen groeien.",
+    "tags": [
+      "vso",
+      "cluster 3",
+      "ondersteuning",
+      "kleine klassen",
+      "praktijk",
+      "arbeid",
+      "entree",
+      "zorg"
+    ]
+  },
+  {
+    "name": "Werkman VMBO",
+    "category": "Vmbo / dalton",
+    "city": "Groningen",
+    "address": "Kluiverboom 1a, 9732 KZ Groningen",
+    "phone": "050 321 0555",
+    "email": "",
+    "website": "https://www.werkmanvmbo.nl",
+    "source": "https://www.scholenmarktgroningen.nl/scholen-in-groningen/werkman-vmbo",
+    "levels": [
+      "vmbo-bb",
+      "vmbo-kb",
+      "vmbo-tl"
+    ],
+    "identity": "Openbaar / dalton",
+    "profile": "Alle vmbo-niveaus, daltononderwijs, persoonlijke coach, leren op eigen tempo en profielen HBR en Dienstverlening & Producten.",
+    "bestFor": "Vmbo-leerlingen die zelfstandig leren met coaching en praktijkprofielen zoeken.",
+    "tags": [
+      "openbaar",
+      "dalton",
+      "vmbo",
+      "coach",
+      "praktijk",
+      "HBR",
+      "dienstverlening",
+      "zelfstandig",
+      "vmbo-bb",
+      "vmbo-kb",
+      "vmbo-tl"
+    ]
+  },
+  {
+    "name": "Willem Lodewijk Gymnasium",
+    "category": "Gymnasium",
+    "city": "Groningen",
+    "address": "Verzetsstrijderslaan 220, 9727 CK Groningen",
+    "phone": "050 526 2094",
+    "email": "info@wlg.nl",
+    "website": "https://www.wlg.nl",
+    "source": "https://www.scholenmarktgroningen.nl/scholen-in-groningen/willem-lodewijk-gymnasium",
+    "levels": [
+      "gymnasium"
+    ],
+    "identity": "Christelijk",
+    "profile": "Klein christelijk categoraal gymnasium met Latijn en Grieks, ongeveer 700 leerlingen, vwo-plusniveau en veel extra projecten/reizen.",
+    "bestFor": "Leerlingen met vwo-advies die gymnasium, kleinschaligheid en christelijke identiteit zoeken.",
+    "tags": [
+      "christelijk",
+      "gymnasium",
+      "vwo",
+      "klassiek",
+      "kleinschalig",
+      "uitdaging",
+      "reizen",
+      "projecten"
+    ]
+  }
+];
+
+    const filters = [
+      ["alles", "Alles"],
+      ["vmbo", "Vmbo"],
+      ["havo", "Havo"],
+      ["vwo", "Vwo"],
+      ["gymnasium", "Gymnasium"],
+      ["praktijkonderwijs", "Praktijkonderwijs"],
+      ["ondersteuning", "Extra ondersteuning"],
+      ["sport", "Sport"],
+      ["techniek", "Techniek/science"],
+      ["creatief", "Kunst/cultuur"],
+      ["tweetalig", "Tweetalig/IB"],
+      ["montessori", "Montessori"],
+      ["vrijeschool", "Vrijeschool"],
+      ["groen", "Groen"],
+      ["regio", "Regio"]
+    ];
+
+    const iconFor = (school) => {
+      const t = school.tags.join(" ").toLowerCase();
+      if (t.includes("gymnasium") || t.includes("klassiek")) return "🏛️";
+      if (t.includes("sport")) return "🏃";
+      if (t.includes("groen") || t.includes("dieren")) return "🌿";
+      if (t.includes("montessori")) return "🧭";
+      if (t.includes("vrijeschool")) return "🎭";
+      if (t.includes("praktijk")) return "🛠️";
+      if (t.includes("tweetalig") || t.includes("internationaal")) return "🌍";
+      if (t.includes("vso") || t.includes("ondersteuning")) return "🤝";
+      return "🎒";
+    };
+
+    const normalize = str => (str || "").toString().toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+    let activeFilter = "alles";
+    let selected = [];
+
+    const cardsEl = document.getElementById("cards");
+    const countEl = document.getElementById("count");
+    const searchEl = document.getElementById("search");
+    const sortEl = document.getElementById("sort");
+    const chipsEl = document.getElementById("chips");
+    const compareBar = document.getElementById("compareBar");
+    const compareText = document.getElementById("compareText");
+
+    function buildChips() {
+      chipsEl.innerHTML = filters.map(([key,label]) =>
+        `<button class="chip ${key === activeFilter ? "active" : ""}" data-filter="${key}" type="button">${label}</button>`
+      ).join("");
+      chipsEl.querySelectorAll(".chip").forEach(btn => {
+        btn.addEventListener("click", () => {
+          activeFilter = btn.dataset.filter;
+          buildChips();
+          render();
+        });
+      });
+    }
+
+    function schoolMatchesFilter(school, f) {
+      if (f === "alles") return true;
+      const hay = normalize([...school.levels, school.category, school.identity, school.profile, school.bestFor, ...school.tags].join(" "));
+      if (f === "vwo") return hay.includes("vwo") || hay.includes("atheneum");
+      if (f === "vmbo") return hay.includes("vmbo") || hay.includes("mavo");
+      if (f === "creatief") return hay.includes("kunst") || hay.includes("cultuur") || hay.includes("creatief") || hay.includes("theater") || hay.includes("muziek");
+      if (f === "techniek") return hay.includes("techniek") || hay.includes("science") || hay.includes("technasium") || hay.includes("onderzoek") || hay.includes("ontwerp");
+      if (f === "tweetalig") return hay.includes("tweetalig") || hay.includes("ib") || hay.includes("internationaal") || hay.includes("tto");
+      return hay.includes(normalize(f));
+    }
+
+    function visibleSchools() {
+      const q = normalize(searchEl.value.trim());
+      const sort = sortEl.value;
+      let out = schools.filter(s => {
+        const hay = normalize([s.name, s.city, s.address, s.category, s.identity, s.profile, s.bestFor, s.levels.join(" "), s.tags.join(" ")].join(" "));
+        return (!q || hay.includes(q)) && schoolMatchesFilter(s, activeFilter);
+      });
+      out.sort((a,b) => {
+        const av = normalize(a[sort] || a.name);
+        const bv = normalize(b[sort] || b.name);
+        return av.localeCompare(bv, "nl");
+      });
+      return out;
+    }
+
+    function render() {
+      const out = visibleSchools();
+      countEl.textContent = `${out.length} van ${schools.length} scholen zichtbaar`;
+      if (!out.length) {
+        cardsEl.innerHTML = `<div class="empty">Geen scholen gevonden. Probeer een breder zoekwoord of filter.</div>`;
+        return;
+      }
+      cardsEl.innerHTML = out.map(s => {
+        const isSelected = selected.includes(s.name);
+        const levels = s.levels.map(l => `<span class="pill level">${l}</span>`).join("");
+        const tags = s.tags.slice(0,5).map(t => `<span class="pill">${t}</span>`).join("");
+        return `<article class="card" data-school="${escapeHtml(s.name)}">
+          <div class="cardTop">
+            <div>
+              <h3>${escapeHtml(s.name)}</h3>
+              <div class="category">${escapeHtml(s.category)} · ${escapeHtml(s.city)}</div>
+            </div>
+            <div class="schoolIcon" aria-hidden="true">${iconFor(s)}</div>
+          </div>
+          <div class="pills">${levels}</div>
+          <p>${escapeHtml(s.profile)}</p>
+          <p class="mini"><strong>Past vaak bij:</strong> ${escapeHtml(s.bestFor)}</p>
+          <div class="pills">${tags}</div>
+          <details>
+            <summary>Praktische gegevens</summary>
+            <ul class="detailList">
+              <li><strong>Identiteit/type:</strong> ${escapeHtml(s.identity)}</li>
+              <li><strong>Adres:</strong> ${escapeHtml(s.address)}</li>
+              <li><strong>Telefoon:</strong> ${escapeHtml(s.phone || "Controleer schoolsite")}</li>
+              <li><strong>E-mail:</strong> ${escapeHtml(s.email || "Controleer schoolsite")}</li>
+            </ul>
+          </details>
+          <div class="cardActions">
+            <a class="smallBtn" href="${s.website}" target="_blank" rel="noopener">Schoolsite ↗</a>
+            <a class="smallBtn" href="${s.source}" target="_blank" rel="noopener">Bron ↗</a>
+            <button class="smallBtn compare ${isSelected ? "active" : ""}" type="button" data-compare="${escapeHtml(s.name)}">${isSelected ? "Geselecteerd" : "Vergelijk"}</button>
+          </div>
+        </article>`;
+      }).join("");
+      cardsEl.querySelectorAll("[data-compare]").forEach(btn => {
+        btn.addEventListener("click", () => toggleCompare(btn.dataset.compare));
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+    }
+
+    function toggleCompare(name) {
+      if (selected.includes(name)) {
+        selected = selected.filter(n => n !== name);
+      } else {
+        if (selected.length >= 3) {
+          alert("Je kunt maximaal drie scholen tegelijk vergelijken. Verwijder eerst één selectie.");
+          return;
+        }
+        selected.push(name);
+      }
+      updateCompareBar();
+      render();
+    }
+
+    function updateCompareBar() {
+      compareText.textContent = `${selected.length} school${selected.length === 1 ? "" : "en"} geselecteerd: ${selected.join(", ") || "geen"}`;
+      compareBar.classList.toggle("show", selected.length > 0);
+    }
+
+    function openCompare() {
+      const chosen = selected.map(n => schools.find(s => s.name === n)).filter(Boolean);
+      if (!chosen.length) return;
+      const rows = [
+        ["Niveaus", s => s.levels.join(", ")],
+        ["Type / identiteit", s => s.identity],
+        ["Profiel", s => s.profile],
+        ["Past vaak bij", s => s.bestFor],
+        ["Adres", s => s.address],
+        ["Contact", s => [s.phone, s.email].filter(Boolean).join(" · ") || "Controleer schoolsite"],
+        ["Website", s => `<a href="${s.website}" target="_blank" rel="noopener">Open schoolsite ↗</a>`]
+      ];
+      const head = `<tr><th>Vergelijkpunt</th>${chosen.map(s => `<th>${escapeHtml(s.name)}</th>`).join("")}</tr>`;
+      const body = rows.map(([label, fn]) => `<tr><th>${label}</th>${chosen.map(s => `<td>${label === "Website" ? fn(s) : escapeHtml(fn(s))}</td>`).join("")}</tr>`).join("");
+      document.getElementById("compareTable").innerHTML = head + body;
+      document.getElementById("modalBackdrop").classList.add("show");
+    }
+
+    function closeCompare() {
+      document.getElementById("modalBackdrop").classList.remove("show");
+    }
+
+    function runMatch() {
+      const level = document.getElementById("qLevel").value;
+      const style = document.getElementById("qStyle").value;
+      const interest = document.getElementById("qInterest").value;
+      const scored = schools.map(s => {
+        const hay = normalize([s.levels.join(" "), s.category, s.identity, s.profile, s.bestFor, s.tags.join(" ")].join(" "));
+        let score = 0;
+        let why = [];
+        if (!level) score += 1;
+        else if (level === "vmbo" && (hay.includes("vmbo") || hay.includes("mavo"))) { score += 4; why.push("niveau past"); }
+        else if (level === "vwo" && (hay.includes("vwo") || hay.includes("atheneum"))) { score += 4; why.push("niveau past"); }
+        else if (hay.includes(normalize(level))) { score += 4; why.push("niveau past"); }
+
+        if (style && hay.includes(normalize(style))) { score += 3; why.push("leerstijl past"); }
+        if (style === "creatief" && (hay.includes("kunst") || hay.includes("cultuur") || hay.includes("theater") || hay.includes("muziek"))) { score += 3; why.push("creatieve keuze"); }
+        if (style === "onderzoek" && (hay.includes("onderzoek") || hay.includes("technasium") || hay.includes("science") || hay.includes("ontwerp"))) { score += 3; why.push("onderzoek/ontwerpen"); }
+        if (style === "structuur" && (hay.includes("structuur") || hay.includes("kleinschalig") || hay.includes("ondersteuning") || hay.includes("kleine"))) { score += 3; why.push("structuur"); }
+
+        if (interest && hay.includes(normalize(interest))) { score += 4; why.push("interesse past"); }
+        if (interest === "techniek" && (hay.includes("techniek") || hay.includes("technasium") || hay.includes("science") || hay.includes("pie") || hay.includes("ontwerp"))) { score += 4; why.push("techniek/science"); }
+        if (interest === "klassiek" && (hay.includes("gymnasium") || hay.includes("latijn") || hay.includes("grieks") || hay.includes("klassiek"))) { score += 4; why.push("klassieke talen"); }
+        if (interest === "ondersteuning" && (hay.includes("ondersteuning") || hay.includes("vso") || hay.includes("facet") || hay.includes("kleine"))) { score += 4; why.push("ondersteuning"); }
+        return {...s, score, why: [...new Set(why)]};
+      }).sort((a,b) => b.score - a.score || a.name.localeCompare(b.name, "nl")).slice(0,5);
+
+      const target = document.getElementById("quizResults");
+      target.innerHTML = scored.map(s => `<div class="match">
+        <div>
+          <strong>${escapeHtml(s.name)}</strong>
+          <div class="mini">${escapeHtml(s.levels.join(", "))} · ${escapeHtml(s.category)}</div>
+          <div class="mini">${escapeHtml(s.why.length ? s.why.join(" · ") : "brede oriëntatie")}</div>
+        </div>
+        <div class="score">${Math.min(99, Math.round((s.score / 15) * 100))}%</div>
+      </div>`).join("");
+    }
+
+    function buildSources() {
+      const list = document.getElementById("sourceList");
+      list.innerHTML = schools.map(s => `<li><a href="${s.source}" target="_blank" rel="noopener">${escapeHtml(s.name)} — bronpagina</a></li>`).join("");
+    }
+
+    searchEl.addEventListener("input", render);
+    sortEl.addEventListener("change", render);
+    document.getElementById("openCompare").addEventListener("click", openCompare);
+    document.getElementById("clearCompare").addEventListener("click", () => { selected = []; updateCompareBar(); render(); });
+    document.getElementById("closeModal").addEventListener("click", closeCompare);
+    document.getElementById("modalBackdrop").addEventListener("click", (e) => { if (e.target.id === "modalBackdrop") closeCompare(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeCompare(); });
+    document.getElementById("matchBtn").addEventListener("click", runMatch);
+
+    buildChips();
+    buildSources();
+    render();
+  </script>
+</body>
+</html>
