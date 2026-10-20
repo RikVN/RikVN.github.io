@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2 voor 12 · Puntenteller</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f6f7fb; color: #172033; font-family: system-ui, sans-serif; line-height: 1.5; }
+    main { width: min(620px, calc(100% - 32px)); margin: 40px auto; }
+    h1 { margin-bottom: 4px; font-size: clamp(28px, 6vw, 38px); letter-spacing: -.04em; }
+    .intro, small { color: #586477; }
+    .intro { margin-top: 0; }
+    .card { margin-top: 24px; padding: 24px; background: white; border: 1px solid #dce1e9; border-radius: 20px; }
+    .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    label { display: block; font-weight: 650; margin-bottom: 8px; }
+    select, input { width: 100%; min-height: 48px; padding: 10px 12px; border: 1px solid #b5bfce; border-radius: 10px; background: white; color: inherit; font: inherit; }
+    select:focus-visible, input:focus-visible { outline: 3px solid #8ab4ee; outline-offset: 2px; }
+    small { display: block; margin-top: 6px; }
+    .score { text-align: center; background: #172033; color: white; }
+    output { display: block; font-size: 64px; font-weight: 800; line-height: 1.2; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+    #error { color: #b42318; margin-bottom: 0; }
+    [hidden] { display: none; }
+    @media (max-width: 480px) { .fields { grid-template-columns: 1fr; } .card { padding: 20px; } main { margin-top: 24px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>2 voor 12 · Puntenteller</h1>
+    <p class="intro">Vul je resultaten in. Je score wordt direct berekend.</p>
+    <form class="card" id="calculator">
+      <div class="fields">
+        <div>
+          <label for="known">Uit het hoofd goed</label>
+          <select id="known" name="known"></select>
+          <small>10 punten erbij per goed antwoord.</small>
+        </div>
+        <div>
+          <label for="errors">Aantal fouten</label>
+          <select id="errors" name="errors"></select>
+          <small>Bonus: 0 fouten +100, 1 fout +75, 2 fouten +50. Vanaf 3 fouten geen bonus.</small>
+        </div>
+        <div>
+          <label for="cost">Opzoekpunten per vraag</label>
+          <input id="cost" name="cost" type="number" min="0" step="1" value="10" required aria-describedby="cost-help">
+          <small id="cost-help">Dit kost elke vraag die je niet uit het hoofd goed had.</small>
+        </div>
+        <div>
+          <label for="letters">Aantal gekochte letters</label>
+          <select id="letters" name="letters"></select>
+          <small>10 punten eraf per letter.</small>
+        </div>
+      </div>
+      <p id="error" role="alert" hidden></p>
+    </form>
+    <section class="card score" aria-label="Totaalscore" aria-live="polite" aria-atomic="true">
+      <span>Je eindscore</span>
+      <output id="total" for="known errors cost letters" form="calculator">—</output>
+      <span>punten</span>
+    </section>
+    <noscript><p>Schakel JavaScript in om de puntenteller te gebruiken.</p></noscript>
+  </main>
+  <script>
+    const get = id => document.getElementById(id);
+    for (const [id, max, initial] of [['known', 12, 6], ['errors', 6, 0], ['letters', 12, 0]]) {
+      for (let n = 0; n <= max; n++) {
+        get(id).add(new Option(String(n), String(n), n === initial, n === initial));
+      }
+    }
+
+    function update() {
+      const known = Number(get('known').value);
+      const errors = Number(get('errors').value);
+      const cost = get('cost').valueAsNumber;
+      const letters = Number(get('letters').value);
+      let error = '';
+      if (!get('cost').validity.valid || !Number.isSafeInteger(cost) || !Number.isSafeInteger(cost * 12)) {
+        error = 'Vul een geldig, niet-negatief geheel aantal opzoekpunten in.';
+      } else if (known + errors > 12) {
+        error = 'Uit het hoofd goed en fouten kunnen samen niet meer dan 12 vragen zijn.';
+      }
+      get('error').textContent = error;
+      get('error').hidden = !error;
+      if (error) {
+        get('total').textContent = '—';
+        return;
+      }
+      const lookup = (12 - known) * cost;
+      const bonus = errors <= 2 ? [100, 75, 50][errors] : 0;
+      const total = 500 - lookup + bonus + known * 10 - letters * 10;
+      get('total').textContent = total.toLocaleString('nl-NL');
+    }
+
+    get('calculator').addEventListener('input', update);
+    get('calculator').addEventListener('change', update);
+    get('calculator').addEventListener('submit', event => event.preventDefault());
+    update();
+  </script>
+</body>
+</html>
