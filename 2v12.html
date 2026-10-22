@@ -308,6 +308,15 @@
 
       <div class="settings" aria-label="Spelopties">
         <div class="setting">
+          <label for="durationSelect">Speeltijd</label>
+          <select id="durationSelect">
+            <option value="120" selected>2:00</option>
+            <option value="150">2:30</option>
+            <option value="180">3:00</option>
+          </select>
+        </div>
+
+        <div class="setting">
           <label for="wrongCountSelect">Gegarandeerd foute letters</label>
           <select id="wrongCountSelect">
             <option value="0" selected>0 foute letters</option>
@@ -4247,6 +4256,7 @@
     const pauseBtn = document.getElementById("pauseBtn");
     const giveUpBtn = document.getElementById("giveUpBtn");
     const newGameBtn = document.getElementById("newGameBtn");
+    const durationSelect = document.getElementById("durationSelect");
     const wrongCountSelect = document.getElementById("wrongCountSelect");
     const correctChanceSelect = document.getElementById("correctChanceSelect");
     const emptyState = document.getElementById("emptyState");
@@ -4459,7 +4469,7 @@
         state.shuffledTiles = buildPuzzleTiles(state.answerTiles, wrongCount, correctChance);
         state.boughtTileIds = new Set();
         state.revealed = Array(state.answerTiles.length).fill(null);
-        state.remainingSeconds = GAME_SECONDS;
+        state.remainingSeconds = Number(durationSelect.value);
         state.paused = false;
         state.started = true;
         state.ended = false;
@@ -4549,6 +4559,12 @@
     }
 
     newGameBtn.addEventListener("click", newGame);
+    durationSelect.addEventListener("change", () => {
+      if (!state.started) {
+        state.remainingSeconds = Number(durationSelect.value);
+        updateTimerDisplay();
+      }
+    });
     pauseBtn.addEventListener("click", togglePause);
     giveUpBtn.addEventListener("click", giveUp);
     guessForm.addEventListener("submit", submitGuess);
