@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5f3ed">
+<meta name="description" content="Acht letters, één minuut. Vind het woord met de paardensprong.">
+<title>Paardensprong — acht letters, één minuut</title>
+<style>
+:root{color-scheme:light;--paper:#f5f3ed;--ink:#213e36;--muted:#68796f;--line:#dfE4dc;--green:#285344;--accent:#dc754e;--red:#a82f32;--radius:26px;font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);min-height:100svh;background-image:radial-gradient(ellipse at 50% 0%,#e6ebe0 0%,transparent 60%)}button,input{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:transparent}button:disabled{cursor:default}button:focus-visible,input:focus-visible{outline:3px solid #c97750;outline-offset:4px}button{touch-action:manipulation}svg{display:block}button svg{pointer-events:none}
+main{max-width:490px;padding:36px 20px 28px;margin:auto}.intro{text-align:center;margin:10px 0 25px}h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(36px,8.5vw,50px);font-weight:400;letter-spacing:-.055em;margin:0 0 10px;line-height:1.1}.card{border:1px solid #e3e7df;background:#fffefa;border-radius:var(--radius);padding:23px 27px 18px;box-shadow:0 12px 36px #263d3010,0 2px 3px #263d3003}.card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}.round{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--muted)}.timer{display:flex;align-items:center;gap:8px;border-radius:30px;background:#eef2e9;padding:8px 13px;font-size:18px;line-height:1;font-weight:650;font-variant-numeric:tabular-nums;transition:background .2s,color .2s}.timer svg{width:20px;height:20px;transform:rotate(-90deg)}.timer circle{fill:none;stroke-width:2.5;stroke:#d0dacb}.timer .remaining{stroke:var(--green);stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:calc(100 * (1 - var(--remaining,1)));transition:stroke-dashoffset .1s linear}.timer.urgent{background:#fff0e8;color:#a44129}.timer.urgent .remaining{stroke:#b84c2c}.board-wrap{position:relative;margin:auto;max-width:340px}.board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;aspect-ratio:1;background:var(--ink);border-radius:19px;padding:10px;box-shadow:inset 0 0 0 1px #16372c}.tile{position:relative;display:flex;justify-content:center;align-items:center;border-radius:10px;background:#f4f1e7;color:var(--ink);font-size:clamp(27px,7vw,40px);font-weight:650;letter-spacing:.01em;line-height:1;user-select:none;transition:background .25s,color .25s,transform .25s}.tile:nth-child(even){background:#e6ebdd}.tile.ij{font-size:clamp(23px,6vw,33px);letter-spacing:-.05em}.tile .number{position:absolute;top:7px;left:8px;font-size:10px;font-weight:650;letter-spacing:0;color:inherit;opacity:.7}.tile.reveal{background:#dce8d2}.tile.first{background:var(--accent);color:#fffefa}.tile .letter{transition:opacity .2s}.center{color:#e3e9dc;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}.center svg{width:39px;height:45px}.board.ready .letter{color:#a4b09c;font-size:22px}.board.ready .tile{background:#eef0e6}.board.ready .tile:nth-child(even){background:#e0e7d7}
+.form-area{margin-top:23px}label{display:block;font-size:12px;font-weight:650;margin:0 0 8px}.answer-row{display:flex;gap:8px}.answer-input{min-width:0;width:100%;height:50px;border:1.5px solid #d9e0d4;border-radius:12px;background:#fff;color:var(--ink);padding:0 14px;font-size:18px;letter-spacing:.07em;box-shadow:0 2px 4px #00000002}.answer-input::placeholder{color:#a1aaa0;letter-spacing:0;font-size:15px}.answer-input:disabled{background:#f1f3ec;color:#627167}.answer-input[aria-invalid="true"]{border-color:var(--red);background:#fff7f4}.check{border:0;border-radius:12px;background:var(--green);color:#fff;padding:0 16px;font-size:13px;font-weight:650}.check:hover{background:#193d30}.check:disabled{background:#c0cabc;color:#fff}.primary{width:100%;height:50px;border:0;border-radius:12px;background:var(--green);color:#fffefa;display:flex;align-items:center;justify-content:center;gap:12px;font-size:14px;font-weight:650;transition:background .2s,transform .2s}.primary:hover{background:#193d30;transform:translateY(-1px)}.primary svg{width:18px;height:18px}.status{min-height:26px;margin:12px 0 5px;font-size:13px;line-height:1.5;text-align:center;color:var(--muted);overflow-wrap:anywhere}.status.error{color:var(--red)}.status.success{color:#286144;font-weight:600}.status.ended{color:var(--ink)}.secondary-row{min-height:30px;display:flex;align-items:center;justify-content:center;gap:14px}.text-button{min-height:40px;border:0;background:transparent;color:var(--muted);font-size:12px;padding:5px 12px;text-decoration:underline;text-decoration-color:#b8c1b1;text-underline-offset:4px}.text-button:hover{color:var(--ink)}.hidden,[hidden]{display:none!important}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:480px){main{padding:24px 16px 20px}.intro{margin:7px 0 20px}.card{padding:18px 19px 13px;border-radius:22px}.card-top{margin-bottom:16px}.board-wrap{max-width:310px}.form-area{margin-top:19px}.check{padding:0 13px}.board{gap:8px;padding:9px}.status{margin-top:10px}}
+@media(max-height:640px){.intro{margin:0 0 14px}h1{font-size:34px}.board-wrap{max-width:240px}.card-top{margin-bottom:12px}.form-area{margin-top:14px}.card{padding-top:14px}.tile{font-size:28px}.tile.ij{font-size:24px}.center svg{width:29px;height:32px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden"><symbol id="horse" viewBox="0 0 48 56"><path d="M12 49h27v5H9v-5h3Zm3-5c0-8 3-12 7-16l-6 2-8-5 5-11 9-5 2-7 6 6c11 3 13 14 10 23l-2 13H15Z" fill="currentColor"/><path d="m13 21 8-3" fill="none" stroke="var(--paper)" stroke-width="2" stroke-linecap="round"/><circle cx="25" cy="13" r="1.5" fill="var(--paper)"/></symbol><symbol id="arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol></svg>
+<main>
+<div class="intro"><h1>Paardensprong</h1></div>
+<section class="card" aria-label="Woordpuzzel">
+<div class="card-top"><span class="round" id="round-label">Klaar voor de start</span><div class="timer" id="timer" role="timer" aria-label="1 minuut resterend"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle class="remaining" cx="12" cy="12" r="9" pathLength="100"/></svg><span id="time">01:00</span></div></div>
+<div class="board-wrap"><div class="board ready" id="board" role="group" aria-label="Letterbord, drie bij drie. Het middelste vak is leeg."></div></div>
+<div class="form-area">
+<button id="start" class="primary" type="button">Start het spel <svg aria-hidden="true"><use href="#arrow"/></svg></button>
+<form id="answer-form" hidden novalidate><label for="answer">Jouw antwoord</label><div class="answer-row"><input class="answer-input" id="answer" name="answer" type="text" placeholder="Typ het woord…" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" maxlength="32" enterkeyhint="done" aria-describedby="feedback"><button class="check" id="check" type="submit">Controleer</button></div></form>
+<p class="status" id="feedback" role="status" aria-live="polite" aria-atomic="true"></p>
+<button id="next" class="primary" type="button" hidden>Volgend woord <svg aria-hidden="true"><use href="#arrow"/></svg></button>
+<div class="secondary-row" id="secondary" hidden><button class="text-button" id="skip" type="button">Toon antwoord</button></div>
+</div>
+</section>
+<p class="sr-only" id="announcement" role="status" aria-live="polite"></p>
+<noscript><p>Schakel JavaScript in om het spel te spelen.</p></noscript>
+</main>
+<script type="application/json" id="word-data">["gemeente","minister","regering","indeling","omgeving","toernooi","gedeelte","kampioen","onderwijs","overheid","opdracht","medaille","situatie","spoorlijn","aandacht","economie","opvolger","koningin","eigenaar","justitie","beweging","advocaat","klooster","probleem","monument","toekomst","afdeling","verleden","selectie","rekening","generaal","eigendom","controle","parochie","zangeres","karakter","operatie","overstap","internet","doelpunt","defensie","landbouw","deelname","vermogen","snelheid","promotie","voorkeur","campagne","landgoed","voorstel","techniek","boerderij","traditie","hoofdrol","marathon","principe","dirigent","voorjaar","coalitie","toezicht","officier","kapitein","ervaring","pensioen","voordeel","priester","incident","scenario","toestand","afscheid","geboorte","antwoord","benaming","echtpaar","leerling","formatie","pissebed","vriendin","gitarist","overname","misbruik","computer","software","toerisme","wiskunde","diameter","telefoon","overgang","behoefte","training","regeling","adviseur","aangifte","voertuig","uitgever","regiment","producer","symfonie","sluiting","stadhuis","volgorde","aankomst","vakantie","waarheid","synoniem","document","explosie","redactie","vuurwerk","muzikant","historie","kruising","notering","bouwwerk","evolutie","dynastie","uiteinde","commando","atletiek","apparaat","kwartaal","directie","tekenaar","zakenman","kalender","blessure","uitkomst","organist","baksteen","landhuis","betaling","filosoof","onderdak","tekening","bezetter","licentie","inflatie","eindpunt","voorkant","afspraak","dreiging","voorzijde","overlast","uitzicht","slavernij","weekblad","nabijheid","voorwerp","zuurstof","uitstoot","subsidie","gedachte","leefwijze","uitbraak","neerslag","harmonie","kilogram","kwartier","fenomeen","oostzijde","parcours","wijziging","aanvraag","woonhuis","migratie","noodzaak","individu","plantage","merknaam","jubileum","bioscoop","zuidzijde","zoogdier","spoorweg","basiliek","paspoort","westzijde","variatie","invaller","synagoge","bewoning","zuidkant","diagnose","ecologie","speeldag","bloedbad","mensheid","diefstal","weergave","register","biologie","feestdag","gebergte","genocide","kapitaal","beloning","regenval","oostkust","driehoek","politica","avontuur","werkwijze","executie","buurland","argument","doorgang","voornaam","huisarts","bataljon","gastheer","oostkant","metrolijn","protocol","opspraak","achtbaan","ordening","ouderdom","stamboom","overkant","mineraal","welvaart","dictator","levering","zijrivier","veeteelt","keizerin","carnaval","genoegen","verdriet","infectie","geologie","overgave","parasiet","theoloog","comeback","gewoonte","oefening","bacterie","blokkade","bepaling","ogenblik","zadeldak","voorstad","voorzorg","raadslid","database","cilinder","voorraad","datering","doodslag","drukkerij","dodental","handicap","labrador","hoorspel","activist","oorkonde","jodendom","afwijking","bezoeker","tweeling","expansie","vertaler","aannemer","agressie","overzijde","bruiloft","pandemie","halfjaar","manifest","voorrang","afdaling","zeewater","anatomie","vitamine","verering","kopgroep","fietspad","schouder","therapie","weeshuis","realisme","golfbaan","speeltijd","piramide","hertogin","jongeman","beginsel","criticus","toetsing","bouwstijl","dimensie","winnares","garantie","saxofoon","finalist","veerboot","reiziger","noodweer","keerzijde","klarinet","intentie","beroerte","zeebodem","isolatie","keramiek","essentie","trilogie","waterval","eurozone","spionage","reductie","danseres","stuwmeer","conditie","raadhuis","stoornis","recessie","aardolie","koolstof","bedenker","gijzeling","vastgoed","traangas","aanschaf","tragedie","tovenaar","verkoper","commotie","bewering","folklore","pianiste","laagland","conclaaf","fantasie","epidemie","instroom","pleidooi","hardware","zuidkust","uitvaart","olieverf","gestalte","rolstoel","stuurman","opleving","clubhuis","deadline","genezing","molecuul","promotor","jaargang","sediment","recensie","kalifaat","membraan","triatlon","codenaam","doorsnee","neergang","dynamiek","keerpunt","openheid","bekering","fascisme","diepgang","afwijzing","voordeur","popgroep","apotheek","griffier","eretitel","ammoniak","naleving","bushalte","educatie","ergernis","betoging","studente","kenteken","mysterie","tuinbouw","noodhulp","automerk","facelift","hoofdpijn","onschuld","zuidoost","olieprijs","gedaante","bewaking","animatie","entiteit","arbeider","lantaarn","elektron","handboek","overhand","aquarium","abdijkerk","injectie","vaartuig","uitgifte","dementie","terugweg","amnestie","omkoping","postcode","makelaar","receptie","afweging","interval","verbruik","trombone","codering","aquaduct","hardheid","uitloper","kuuroord","vacature","gladheid","koploper","biograaf","bloeitijd","titelrol","huisdier","analogie","meerkamp","tafereel","imperium","beleving","slotfase","minnares","sanering","prognose","inkeping","afmeting","debutant","veteraan","tiebreak","doctrine","graffiti","natuurijs","ijzererts","advocate","tegenzin","leukemie","humanist","cannabis","kieslijst","piraterij","oxidatie","buurdorp","inspraak","monogram","rebellie","operator","veelvoud","eindzege","kuitbeen","krokodil","maaiveld","keurmerk","terugval","potentie","atoombom","lidstaat","voetstuk","mascotte","raadsman","verrader","genetica","inwijding","obstakel","wegennet","sabotage","acroniem","wetgever","keyboard","badkamer","juwelier","overspel","huisstijl","rijstrook","namiddag","valsheid","vrijgezel","begintijd","automaat","vliegtijd","fluitist","metafoor","precisie","hoogbouw","schaamte","geograaf","hockeyer","buskruit","provider","revolver","doorslag","bladzijde","drieluik","jaloezie","broncode","dividend","databank","marxisme","roofdier","inlijving","radiohit","overslag","detentie","chemicus","onderarm","plagiaat","voorwiel","bouwjaar","brochure","kameleon","scholier","overmaat","dosering","toonbank","heleboel","cassette","uitbater","nokkenas","voertaal","retoriek","gijzelaar","clausule","roepnaam","leidraad","omhulsel","klemtoon","zomertijd","insuline","duikboot","stagiair","ongenade","erfpacht","raakvlak","waterput","boekjaar","ommekeer","bakermat","uitdager","vaargeul","vakgroep","symbiose","inductie","draagtijd","operette","motorkap","relikwie","neusbeen","zeehaven","inboedel","voorbode","erfrecht","raamwerk","rondreis","koelkast","voortouw","loopbrug","autopsie","essayist","ooievaar","valpartij","pedagoog","imitatie","inbreker","juffrouw","opruiing","alchemie","papegaai","pluimvee","maquette","samoerai","urgentie","bijgeloof","boosheid","voorruit","gietijzer","onbegrip","prediker","leisteen","legering","zeevaart","miskraam","netvlies","sensatie","tweeluik","liedboek","crematie","beharing","jaarboek","uittocht","hoofdlijn","weerslag","megawatt","silicium","tijdsduur","broedtijd","opponent","communie","rangorde","maatwerk","maatstaf","moestuin","titanium","exponent","elleboog","metgezel","aanplant","kerosine","cocktail","modehuis","rijgedrag","halfpipe","obsessie","vangrail","echtheid","rampjaar","silhouet","profetie","partijtop","bijgebouw","bezitter","revanche","geldnood","lidwoord","veerpont","viroloog","scriptie","zoutzuur","sidekick","naaldbos","populier","olijfolie","proeftijd","trambaan","afzender","anekdote","tatoeage","spandoek","ongeloof","bemaling","extensie","waakhond","postbode","trombose","polemiek","beenmerg","monoloog","aanwinst","roulatie","zionisme","litteken","knoflook","droogdok","speeksel","kabouter","polymeer","goudsmid","strafeis","bloeding","geleider","chantage","kookpunt","subgenre","kibboets","kookboek","laagbouw","enkeling","topmodel","rusthuis","anarchie","detectie","placenta","corrosie","kwadraat","liveshow","oprijlaan","edelsmid","werkweek","empathie","redenaar","farmacie","eindfase","detector","aanzicht","schreeuw","gaskraan","leerboek","boekwerk","azijnzuur","leerjaar","draaiing","coaching","waterrad","tegengif","kolenmijn","werktuig","vaatwerk","voorpoot","handdoek","animator","zeilboot","compiler","dressuur","wijkagent","seksisme","zestiger","zenuwgas","zijstraat","huiswerk","roeister","belegger","barbecue","karavaan","feminist","tijdgeest","omnivoor","tirannie","momentum","puinhoop","drijfveer","marionet","noodklok","waterlijn","bedijking","proviand","weerwolf","achteras","dynamiet","aantocht","nicotine","panellid","initiaal","instinct","kraambed","souvenir","inclusie","gevaarte","zomerhit","bladgoud","dakkapel","metadata","hoofdvak","leefstijl","nadering","regenbui","beroving","aandrang","kleuring","vocalist","leidster","hoektand","rolmodel","marinier","strateeg","orchidee","erflater","allergie","kerkkoor","logement","boomstam","huurprijs","celibaat","ornament","leegloop","bovenarm","stroperij","stijfheid","artieste","semester","theehuis","omkering","opsteker","showroom","oplegger","leeszaal","fotoboek","huurling","desertie","zondebok","exitpoll","kameraad","bouwwijze","hielbeen","plakkaat","einddoel","briefing","pijporgel","kapsalon","zinsnede","eurocent","olieveld","doorvoer","ozonlaag","excursie","olietank","villawijk","bedelaar","fraudeur","drainage","palmolie","pacifist","inenting","catering","actiedag","doofheid","hijskraan","navolger","bouwplan","bouwland","tandwiel","veelhoek","huisraad","woonboot","doorreis","imitator","huisbaas","medemens","geraamte","honingbij","evenknie","ijsbreker","katapult","goedheid","aanjager","bovenlip","vierkamp","begeerte","spinazie","eetkamer","speelbal","bloedvat","aanstoot","voetbrug","voortuin","hoogoven","boekweit","raceteam","tandenrij","piercing","seinhuis","eindbaas","houtwerk","roeiboot","anomalie","trottoir","pleister","naaister","ophoping","meeldauw","optelsom","overhemd","ijdelheid","artefact","spinnerij","kuisheid","jiujitsu","grandeur","copiloot","rijschool","bakboord","motoriek","verflaag","waarborg","modeshow","kolonist","voetnoot","tweekamp","gigabyte","voorspel","swastika","bezorger","testfase","vagevuur","stramien","koolzaad","partijlid","spierpijn","radiator","zielzorg","breuklijn","aspirant","kopstoot","everzwijn","prothese","topvrouw","cognitie","slagader","woonblok","hysterie","hoekpand","bouwblok","koopwaar","subtitel","reisgids","melkzuur","keepster","overdruk","autorace","aambeeld","teambaas","slagboom","reinheid","windhoos","palmboom","clitoris","raadzaal","lingerie","koolzuur","drietand","denkwijze","filosofe","omroeper","lekkernij","boterham","hoekpunt","aangroei","olieramp","gaskamer","slagroom","hardhout","trouwdag","noodplan","racespel","kademuur","harpiste","onderlip","pizzeria","partitie","glasraam","hovenier","bakfiets","hologram","zangkoor","samenzijn","clublied","stimulus","prostaat","windvaan","deductie","lijfrente","ophoging","koufront","dodencel","doublure","okergeel","opvoeder","bouwstop","parabool","meerprijs","affectie","fonetiek","leergang","toevloed","tekenles","zeevogel","vioolles","vierhoek","melanoom","discipel","limonade","antilope","zenuwcel","siertuin","visvijver","robotica","firewall","zwakheid","difterie","koosnaam","wroeging","diskette","zegening","erewacht","oliepomp","douanier","overdaad","mediator","afdracht","agitatie","vrijbrief","eindspel","hoekhuis","leerstof","kampvuur","loonlijst","rijverbod","hoefijzer","liveband","wapenwet","galblaas","tuinhuis","ondiepte","fructose","huisvuil","fractuur","bovenlijf","doopnaam","retailer","meniscus","modemerk","stoeterij","deflatie","tipgever","maagzuur","raceauto","antiheld","zinsbouw","tijgermug","robotarm","buurtbus","apostrof","debiteur","huurhuis","biosfeer","simkaart","aangever","zinsdeel","hangijzer","olievlek","firmware","bevrijder","huismerk","ansjovis","tuinmuur","paasvuur","zoetstof","spoedwet","danszaal","kerntaak","collecte","capuchon","ledemaat","zebrapad","donateur","brouwsel","katheter","optimist","onbalans","kolibrie","roodheid","ideoloog","melanine","afperser","rantsoen","onderrug","provisie","cortisol","zeeschip","lavendel","biefstuk","regelaar","eileider","blauwalg","eerwraak","rookwolk","trouwerij","overhead","tovenarij","eerbewijs","kopermijn","wegwijzer","koorzang","emigrant","woestenij","belading","kaalslag","prijspeil","deceptie","oudtante","bloemist","spelfout","abdijbier","weeskind","saffraan","hotelier","geurstof","gigawatt","braderie","rollator","overwerk","goudprijs","noodstop","fastfood","megafoon","drieling","bergtrui","woonplek","braaksel","opleider","grootoom","voorhuid","ratelaar","keurslijf","indiener","sarcasme","eikenbos","marifoon","tijdrijder","zaagblad","rekensom","kilowatt","klaproos","zomerdag","bootsman","bootreis","toeriste","monoliet","bergmeer","aspirine","stuurhut","vuurdoop","broekzak","proefrit","zonnebad","karateka","laagveen","agressor","inwoning","leerplan","meetpunt","opticien","eenakter","huismuis","beschuit","kneuzing","loopwerk","oldtimer","pancreas","sjabloon","ademnood","racebaan","alpinist","xylofoon","melkboer","ovulatie","absentie","paplepel","omvormer","idealist","sojasaus","broedsel","spuitbus","balbezit","muilezel","zeildoek","eierstok","sinecure","zeefdruk","spaarpot","homepage","zuurkool","humorist","vrijpartij","zeilster","hoefsmid","betonrot","glooiing","stellage","ongeduld","ramkraak","laborant","heenreis","elastiek","staccato","kaakbeen","teamchef","olielamp","homoniem","ketamine","beletsel","narcisme","synergie","boekband","testbaan","implosie","puurheid","eisprong","maffioso","gradatie","conifeer","bloedcel","keratine","eettafel","treinrit","zelfbouw","kijkwijzer","skipiste","sleepnet","broeikas","taxateur","huurauto","olijfboom","uitdijing","weekdier","waterpas","overtrek","trekhaak","warenwet","tolpoort","verdeler","meikever","spervuur","steelpan","breiwerk","speurder","bankroof","zeerover","bravoure","hoofdsom","achthoek","lastdier","scoliose","matiging","bloedlijn","methadon","vibrator","oogzenuw","thermiek","botbreuk","boombast","ijzerwerk","kaalheid","grooming","clublogo","echolood","filedruk","regenbos","spoeling","beginner","zeekraal","grafrede","ingeving","rijexamen","levertijd","hoofdzin","zonnecel","speelhal","voetzool","emfyseem","armatuur","dienblad","naambord","wasvrouw","woonvorm","intranet","glaucoom","aardkern","saboteur","spitsuur","megabyte","autoshow","noodknop","roeibaan","remslaap","buikwand","oogkleur","oliebron","slaapzak","oncoloog","afvalbak","frisheid","wastafel","zegswijze","nietsnut","loofboom","waterbak","kartbaan","grijsaard","dagloner","laadpaal","mildheid","zenuwgif","stoofpot","autopech","loopster","blondine","drumsolo","telwoord","voorband","panfluit","populist","aanrecht","oogsttijd","bladluis","bloempot","peroxide","loopband","rondetijd","taakbalk","tankauto","koophuis","afvaller","overmoed","badwater","jurering","koopprijs","laksheid","reisduur","treurnis","veldmuis","boerkini","hanenkam","terabyte","triljoen","fontanel","reisdoel","abrikoos","postduif","dienares","keuzevak","kwetsuur","modeblad","rodehond","korenaar","roofbouw","veganist","kruitvat","fauteuil","coulance","windhaan","antistof","denkfout","feromoon","teenager","meerpaal","attentie","bosvogel","trekdier","waakvlam","waterpijp","amethist","renpaard","modezaak","zoekterm","gekibbel","zeeslang","maagwand","cateraar","zeekaart","dagkaart","bullebak","theologe","koopakte","plooiing","zekering","laadklep","pyromaan","rotstuin","kardemom","croupier","hematoom","voortand","wijnkoper","dauwpunt","omarming","vaagheid","autoband","opziener","tegenzet","theetuin","biografe","nagellak","kilobyte","koersval","vuistbijl","dambreuk","docusoap","hoefdier","huurbaas","haarstijl","pianoduo","oogappel","bombrief","neuspunt","pilsbier","grofvuil","forehand","strohoed","notendop","lampolie","alarmbel","droogtijd","gekonkel","sierboom","autowrak","bijfiguur","smelterij","jaarloon","jazztrio","omkoperij","visagist","herderin","ambtseed","antoniem","grossier","loopneus","vakbeurs","jongleur","leegheid","vibratie","kaarsvet","hasjiesj","souschef","dystopie","deurpost","kassabon","zoetheid","bekoring","boekdeel","vormfout","zaadbank","naaiwerk","handboog","zeelucht","hazenpad","mondhoek","gedonder","taalspel","boothuis","meeloper","bolgewas","zoetzuur","gifbeker","uitsnede","houtworm","taaiheid","hielprik","bouwkeet","aanrijtijd","babyboom","bedelarij","oliedruk","roeiclub","erewoord","bieslook","doorloop","gepeupel","afwasser","couveuse","draaidag","eerzucht","autodief","oppasser","kleinvee","omlijning","zaailing","sproeier","ceintuur","eindtune","drievoud","autoruit","leesboek","etenstijd","onderlijf","ademtest","paashaas","leefloon","onderrok","bombarie","ligweide","popidool","islamist","ijsvlakte","meetfout","artisjok","armbreuk","fotozaak","emoticon","kippenei","heupbeen","deelauto","heesheid","houtvuur","marinade","kweepeer","behoeder","weekeind","bierhuis","hooivork","erfvijand","saaiheid","oppepper","koolraap","pedicure","apenrots","demagoog","huurkoop","maanzaad","eetgerei","autodeur","buikloop","tuinboon","koelhuis","orgelpijp","boulimie","bierkaai","busroute","roomkaas","eetlepel","inlegvel","kroepoek","rariteit","volgauto","weekloon","gedierte","manicure","eidooier","oneliner","taalfout","arcering","infobord","opdoffer","waanidee","weerhaan","inktlint","proeverij","zeurpiet","zeeotter","aanwijzer","geldauto","solarium","diervoer","theedoek","zijpaneel","filodeeg","huisdeur","liftkooi","aanrader","pieptoon","haakneus","deugniet","luxeauto","maismeel","viervoud","inzender","armsteun","masseuse","roeiriem","autoveer","inleving","peetzoon","bouwpuin","autoclub","rauwheid","anijszaad","bouwdoos","leerdoel","eyeliner","ongerief","seinpaal","duurloop","kiestoon","tuindeur","uitbijter","uurwijzer","vaatdoek","botsauto","draaihek","draaitol","spelwijze","snijbloem","kunstaas","remklauw","biergist","versmaat","braakbal","millibar","naamlijst","zaagtand","zonnedek","meelworm","snelvuur","tuinslak","bijennest","fotoclub","satanist","whodunit","goudstuk","stuclaag","werktaal","rugspier","bijenstal","nihilist","trimbaan","buikdans","handboor","huisspin","zuigmond","staalwol","tijdreeks","havenwijk","peilstok","spatader","toverbal","bilspier","voetstap","vraagzin","bodysuit","bloembol","kanonbal","motorrem","wijnteelt","zeilclub","topcoach","blaaspijp","leesbril","bierglas","kipfilet","wrakhout","sojamelk","kijkcijfer","bedstede","sluwheid","wijnmaker","dijkbreuk","klimmuur","slimheid","weegbrug","viswater","barvrouw","bijeffect","suppoost","charmeur","kogelvis","stortbui","wasbeurt","regenpijp","kengetal","plakboek","vliering","halsdoek","pofbroek","landroof","houtpulp","drafbaan","snotneus","fasering","zandduin","zitkamer","touchpad","pollepel","bakplaat","huisvlijt","neusbrug","duikbril","stukloon","regenton","weertype","lagerwal","geroddel","kamerjas","chatroom","steenwol","bloembak","telelens","houtblok","kasjmier","tentdoek","spaarder","typefout","mesthoop","bijenvolk","deurkruk","stoombad","webadres","messteek","teamarts","haarband","rouwband","slaapgas","testikel","lentedag","beenwond","werkboek","perszaal","drukfout","geldezel","miskleun","reislust","graszode","fietstas","tegenbod","vuurkorf","blaasgat","hazenlip","knieband","zelfhaat","broekpak","persfoto","drilboor","kogelgat","pijptabak","viskraam","snobisme","doodskop","babyfoon","gejammer","gemopper","braadpan","danspaar","behanger","meetlint","ledikant","tafelwijn","touwbrug","neusring","versheid","driftbui","graszaad","zenuwpijn","terugrit","deurknop","voortent","lijkstoet","spekkoek","notulist","dompteur","fopspeen","techneut","handzaag","tapwater","leesclub","leeslijst","visgraat","dagdroom","dagritme","hapering","waterkan","speklaag","klimtouw","topscore","lintzaag","meerwerk","menubalk","reisgeld","bijenkast","gebulder","dressoir","hartzeer","gasmeter","laadpunt","pijniging","spoelbak","zeepkist","duimstok","fietsbel","ladekast","sektelid","meerling","nepbloed","ligstoel","snijtafel","waterbed","bovenrug","doodkist","doopjurk","gerinkel","steekmug","themadag","wildheid","smaakzin","kolenhok","haarverf","broekrok","wijnsoort","zoekbalk","hotelbar","huidarts","wijnoogst","muilkorf","kraamtijd","betweter","jaarring","punthoed","rugsteun","wijnkaart","quizshow","dekvloer","huidtype","pleegzus","rijstebrij","smeersel","tuinbank","berggeit","lefgozer","deurlijst","huurgeld","huurpand","jeugdtijd","wijkfeest","zandkuil"]</script>
+<script>
+'use strict';
+(() => {
+  const WORDS = JSON.parse(document.getElementById('word-data').textContent);
+  const WORD_SET = new Set(WORDS);
+  const CYCLE = [0, 5, 6, 1, 8, 3, 2, 7];
+  const DURATION = 60000;
+  const $ = id => document.getElementById(id);
+  const board = $('board'), input = $('answer'), form = $('answer-form'), feedback = $('feedback');
+  const timer = $('timer'), time = $('time'), start = $('start'), next = $('next'), check = $('check');
+  const cells = new Map();
+  let phase = 'ready', bag = [], lastWord = '', lastStart = -1, round = 0;
+  let activeWord = '', layout = [], validAnswers = new Map(), interval = null;
+  let startWall = 0, startMono = 0, secondsShown = 60, warned = false;
+  const tokenize = word => word.match(/ij|[a-z]/g) || [];
+  const normalise = value => value.trim().toLowerCase().replace(/ĳ/g, 'ij');
+  function randomInt(max) {
+    if (globalThis.crypto && typeof globalThis.crypto.getRandomValues === 'function') {
+      const values = new Uint32Array(1), limit = 4294967296 - (4294967296 % max);
+      do { globalThis.crypto.getRandomValues(values); } while (values[0] >= limit);
+      return values[0] % max;
+    }
+    return Math.floor(Math.random() * max);
+  }
+  function shuffle(values) {
+    for (let i = values.length - 1; i > 0; i--) {
+      const j = randomInt(i + 1); [values[i], values[j]] = [values[j], values[i]];
+    }
+    return values;
+  }
+  function takeWord() {
+    if (!bag.length) {
+      bag = shuffle([...WORDS]);
+      if (bag[bag.length - 1] === lastWord) [bag[0], bag[bag.length - 1]] = [bag[bag.length - 1], bag[0]];
+    }
+    lastWord = bag.pop();
+    return lastWord;
+  }
+  function pathFor(offset, direction) {
+    return Array.from({length: 8}, (_, i) => CYCLE[(offset + direction * i + 16) % 8]);
+  }
+  function answersFor(letters) {
+    const answers = new Map();
+    for (let offset = 0; offset < 8; offset++) {
+      for (const direction of [-1, 1]) {
+        const path = pathFor(offset, direction);
+        const word = path.map(index => letters[index]).join('').toLowerCase();
+        if (WORD_SET.has(word)) answers.set(word, path);
+      }
+    }
+    return answers;
+  }
+  for (let i = 0; i < 9; i++) {
+    const cell = document.createElement('div');
+    if (i === 4) {
+      cell.className = 'center'; cell.setAttribute('aria-hidden', 'true');
+      cell.innerHTML = '<svg><use href="#horse"/></svg>';
+    } else {
+      cell.className = 'tile';
+      cell.innerHTML = '<span class="number" aria-hidden="true"></span><span class="letter">·</span>';
+      cell.setAttribute('aria-label', `Rij ${Math.floor(i / 3) + 1}, kolom ${i % 3 + 1}: leeg`);
+      cells.set(i, cell);
+    }
+    board.appendChild(cell);
+  }
+  function setFeedback(message, kind = '') {
+    feedback.textContent = message;
+    feedback.className = 'status' + (kind ? ' ' + kind : '');
+  }
+  function elapsed() { return Math.max(0, Date.now() - startWall, performance.now() - startMono); }
+  function paintTimer(remaining) {
+    const seconds = Math.ceil(remaining / 1000);
+    time.textContent = `${Math.floor(seconds / 60).toString().padStart(2, '0')}:${(seconds % 60).toString().padStart(2, '0')}`;
+    timer.style.setProperty('--remaining', Math.max(0, remaining / DURATION));
+    timer.classList.toggle('urgent', remaining <= 10000);
+    if (seconds !== secondsShown) {
+      timer.setAttribute('aria-label', `${seconds} seconden resterend`);
+      secondsShown = seconds;
+    }
+  }
+  function reveal(word) {
+    const path = validAnswers.get(word);
+    path.forEach((index, order) => {
+      const cell = cells.get(index);
+      cell.classList.add('reveal');
+      cell.classList.toggle('first', order === 0);
+      cell.querySelector('.number').textContent = order + 1;
+      cell.setAttribute('aria-label', `Stap ${order + 1}: ${layout[index].toUpperCase()}, rij ${Math.floor(index / 3) + 1}, kolom ${index % 3 + 1}`);
+    });
+  }
+  function finish(result, word = activeWord) {
+    if (phase !== 'playing') return;
+    phase = result;
+    clearInterval(interval); interval = null;
+    check.disabled = true; input.disabled = true; input.removeAttribute('aria-invalid');
+    $('secondary').hidden = true; next.hidden = false;
+    reveal(word);
+    if (result === 'won') {
+      paintTimer(Math.max(0, DURATION - elapsed()));
+      setFeedback(`Goed! ${word.toUpperCase()} · ${Math.min(60, Math.max(1, Math.ceil(elapsed() / 1000)))} seconden`, 'success');
+    } else {
+      if (result === 'expired') paintTimer(0);
+      setFeedback(`${result === 'expired' ? 'Tijd om.' : 'Het antwoord:'} ${word.toUpperCase()}`, 'ended');
+    }
+    next.focus({preventScroll: true});
+  }
+  function tick() {
+    if (phase !== 'playing') return;
+    const remaining = Math.max(0, DURATION - elapsed());
+    paintTimer(remaining);
+    if (!remaining) { finish('expired'); return; }
+    if (remaining <= 10000 && !warned) {
+      warned = true; $('announcement').textContent = 'Nog 10 seconden.';
+    }
+  }
+  function newRound() {
+    clearInterval(interval);
+    activeWord = takeWord();
+    const offsets = Array.from({length: 8}, (_, i) => i).filter(i => i !== lastStart);
+    lastStart = offsets[randomInt(offsets.length)];
+    const path = pathFor(lastStart, randomInt(2) ? 1 : -1);
+    const letters = tokenize(activeWord);
+    layout = Array(9).fill('');
+    path.forEach((index, order) => { layout[index] = letters[order]; });
+    validAnswers = answersFor(layout);
+    cells.forEach((cell, index) => {
+      cell.className = 'tile' + (layout[index] === 'ij' ? ' ij' : '');
+      cell.querySelector('.letter').textContent = layout[index].toUpperCase();
+      cell.querySelector('.number').textContent = '';
+      cell.setAttribute('aria-label', `Rij ${Math.floor(index / 3) + 1}, kolom ${index % 3 + 1}: ${layout[index].toUpperCase()}`);
+    });
+    board.classList.remove('ready');
+    round++; $('round-label').textContent = `Puzzel ${String(round).padStart(2, '0')}`;
+    start.hidden = true; next.hidden = true; form.hidden = false; $('secondary').hidden = false;
+    input.disabled = false; check.disabled = false; input.value = ''; input.removeAttribute('aria-invalid');
+    setFeedback(''); $('announcement').textContent = '';
+    phase = 'playing'; warned = false; startWall = Date.now(); startMono = performance.now();
+    secondsShown = -1; paintTimer(DURATION);
+    interval = setInterval(tick, 100);
+    input.focus({preventScroll: true});
+  }
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    if (phase !== 'playing') return;
+    tick(); if (phase !== 'playing') return;
+    const guess = normalise(input.value);
+    if (!guess) { setFeedback('Typ eerst een woord.', 'error'); input.focus(); return; }
+    if (validAnswers.has(guess)) { finish('won', guess); return; }
+    input.setAttribute('aria-invalid', 'true');
+    setFeedback('Nog niet. Probeer opnieuw.', 'error');
+    input.focus({preventScroll: true}); input.select();
+  });
+  input.addEventListener('input', () => {
+    if (phase !== 'playing') return;
+    input.removeAttribute('aria-invalid');
+    if (feedback.classList.contains('error')) setFeedback('');
+  });
+  start.addEventListener('click', newRound);
+  next.addEventListener('click', newRound);
+  $('skip').addEventListener('click', () => { tick(); if (phase === 'playing') finish('skipped'); });
+  document.addEventListener('visibilitychange', tick);
+  window.addEventListener('pageshow', tick);
+  window.addEventListener('focus', tick);
+})();
+</script>
+</body>
+</html>
