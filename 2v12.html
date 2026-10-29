@@ -189,6 +189,13 @@
       user-select: none;
     }
 
+    .letter-tile.uncertain {
+      background: #7f1d1d;
+      box-shadow: 0 8px 18px rgba(180, 35, 24, 0.22);
+    }
+
+    .letter-tile.uncertain:hover:not(:disabled) { background: #991b1b; }
+
     .letter-tile.bought {
       background: var(--tile-bought);
       color: var(--tile-bought-text);
@@ -311,19 +318,21 @@
           <label for="durationSelect">Speeltijd</label>
           <select id="durationSelect">
             <option value="120" selected>2:00</option>
+            <option value="135">2:15</option>
             <option value="150">2:30</option>
             <option value="180">3:00</option>
           </select>
         </div>
 
         <div class="setting">
-          <label for="wrongCountSelect">Gegarandeerd foute letters</label>
+          <label for="wrongCountSelect">Foute letters</label>
           <select id="wrongCountSelect">
             <option value="0" selected>0 foute letters</option>
             <option value="1">1 foute letter</option>
             <option value="2">2 foute letters</option>
             <option value="3">3 foute letters</option>
             <option value="4">4 foute letters</option>
+            <option value="half-chance">1 rode letter: 50% kans op fout</option>
           </select>
         </div>
 
@@ -4350,14 +4359,24 @@
       return positions.slice(0, Math.max(0, Math.min(count, max)));
     }
 
-    function buildPuzzleTiles(answerTiles, guaranteedWrongCount, correctChance) {
+    function buildPuzzleTiles(answerTiles, guaranteedWrongCount, correctChance, uncertainLetter = false) {
       const tiles = answerTiles.map((tile, index) => ({
         id: makeId(tile, index),
         value: tile,
         correctValue: tile,
         answerIndex: index,
-        isWrong: false
+        isWrong: false,
+        isUncertain: false
       }));
+
+      if (uncertainLetter) {
+        const tile = sample(tiles);
+        tile.isUncertain = true;
+        if (Math.random() < 0.5) {
+          tile.value = pickWrongTile(tile.correctValue);
+          tile.isWrong = true;
+        }
+      }
 
       const guaranteedWrongPositions = new Set(getRandomPositions(guaranteedWrongCount, answerTiles.length));
 
@@ -4367,7 +4386,7 @@
       });
 
       tiles.forEach((tile, index) => {
-        if (tile.isWrong) return;
+        if (tile.isWrong || tile.isUncertain) return;
         const becomesWrong = Math.random() > (correctChance / 100);
         if (becomesWrong) {
           tile.value = pickWrongTile(answerTiles[index]);
@@ -4427,6 +4446,10 @@
         const button = document.createElement("button");
         button.type = "button";
         button.className = "letter-tile";
+        if (tile.isUncertain) {
+          button.classList.add("uncertain");
+          button.title = "Deze letter heeft 50% kans om fout te zijn.";
+        }
         button.textContent = formatTile(tile.value);
         button.disabled = state.ended || state.paused || state.boughtTileIds.has(tile.id);
         if (state.boughtTileIds.has(tile.id)) button.classList.add("bought");
@@ -4458,7 +4481,8 @@
       stopTimer();
       try {
         const answer = pickWord();
-        const wrongCount = Number(wrongCountSelect.value);
+        const uncertainLetter = wrongCountSelect.value === "half-chance";
+        const wrongCount = uncertainLetter ? 0 : Number(wrongCountSelect.value);
         const correctChance = Number(correctChanceSelect.value);
 
         state.previousAnswer = answer;
@@ -4466,7 +4490,7 @@
         state.answerTiles = splitTiles(answer);
         state.wrongCount = wrongCount;
         state.correctChance = correctChance;
-        state.shuffledTiles = buildPuzzleTiles(state.answerTiles, wrongCount, correctChance);
+        state.shuffledTiles = buildPuzzleTiles(state.answerTiles, wrongCount, correctChance, uncertainLetter);
         state.boughtTileIds = new Set();
         state.revealed = Array(state.answerTiles.length).fill(null);
         state.remainingSeconds = Number(durationSelect.value);
@@ -4475,7 +4499,9 @@
         state.ended = false;
         guessInput.value = "";
 
-        setMessage(`Nieuw spel gestart. De letters zijn vooraf gemaakt met ${wrongCount} gegarandeerde foute letter(s) en ${correctChance}% correct-kans. Welke letters fout zijn, blijft verborgen.`, "");
+        setMessage(uncertainLetter
+          ? `Nieuw spel gestart. De rode letter heeft 50% kans om fout te zijn, maar kan ook correct zijn. De overige letters hebben ${correctChance}% kans om correct te zijn.`
+          : `Nieuw spel gestart. De letters zijn vooraf gemaakt met ${wrongCount} gegarandeerde foute letter(s) en ${correctChance}% correct-kans. Welke letters fout zijn, blijft verborgen.`, "");
         render();
         startTimer();
         guessInput.focus();
