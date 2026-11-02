@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f3ed">
-<meta name="description" content="Acht letters, één minuut. Vind het woord met de paardensprong.">
-<title>Paardensprong — acht letters, één minuut</title>
+<meta name="description" content="Acht letters, 30 seconden. Vind het woord met de paardensprong.">
+<title>Paardensprong — acht letters, 30 seconden</title>
 <style>
 :root{color-scheme:light;--paper:#f5f3ed;--ink:#213e36;--muted:#68796f;--line:#dfE4dc;--green:#285344;--accent:#dc754e;--red:#a82f32;--radius:26px;font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);min-height:100svh;background-image:radial-gradient(ellipse at 50% 0%,#e6ebe0 0%,transparent 60%)}button,input{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:transparent}button:disabled{cursor:default}button:focus-visible,input:focus-visible{outline:3px solid #c97750;outline-offset:4px}button{touch-action:manipulation}svg{display:block}button svg{pointer-events:none}
@@ -21,7 +21,7 @@ main{max-width:490px;padding:36px 20px 28px;margin:auto}.intro{text-align:center
 <main>
 <div class="intro"><h1>Paardensprong</h1></div>
 <section class="card" aria-label="Woordpuzzel">
-<div class="card-top"><span class="round" id="round-label">Klaar voor de start</span><div class="timer" id="timer" role="timer" aria-label="1 minuut resterend"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle class="remaining" cx="12" cy="12" r="9" pathLength="100"/></svg><span id="time">01:00</span></div></div>
+<div class="card-top"><span class="round" id="round-label">Klaar voor de start</span><div class="timer" id="timer" role="timer" aria-label="30 seconden resterend"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle class="remaining" cx="12" cy="12" r="9" pathLength="100"/></svg><span id="time">00:30</span></div></div>
 <div class="board-wrap"><div class="board ready" id="board" role="group" aria-label="Letterbord, drie bij drie. Het middelste vak is leeg."></div></div>
 <div class="form-area">
 <button id="start" class="primary" type="button">Start het spel <svg aria-hidden="true"><use href="#arrow"/></svg></button>
@@ -41,14 +41,14 @@ main{max-width:490px;padding:36px 20px 28px;margin:auto}.intro{text-align:center
   const WORDS = JSON.parse(document.getElementById('word-data').textContent);
   const WORD_SET = new Set(WORDS);
   const CYCLE = [0, 5, 6, 1, 8, 3, 2, 7];
-  const DURATION = 60000;
+  const DURATION = 30000;
   const $ = id => document.getElementById(id);
   const board = $('board'), input = $('answer'), form = $('answer-form'), feedback = $('feedback');
   const timer = $('timer'), time = $('time'), start = $('start'), next = $('next'), check = $('check');
   const cells = new Map();
   let phase = 'ready', bag = [], lastWord = '', lastStart = -1, round = 0;
   let activeWord = '', layout = [], validAnswers = new Map(), interval = null;
-  let startWall = 0, startMono = 0, secondsShown = 60, warned = false;
+  let startWall = 0, startMono = 0, secondsShown = 30, warned = false;
   const tokenize = word => word.match(/ij|[a-z]/g) || [];
   const normalise = value => value.trim().toLowerCase().replace(/ĳ/g, 'ij');
   function randomInt(max) {
@@ -134,7 +134,7 @@ main{max-width:490px;padding:36px 20px 28px;margin:auto}.intro{text-align:center
     reveal(word);
     if (result === 'won') {
       paintTimer(Math.max(0, DURATION - elapsed()));
-      setFeedback(`Goed! ${word.toUpperCase()} · ${Math.min(60, Math.max(1, Math.ceil(elapsed() / 1000)))} seconden`, 'success');
+      setFeedback(`Goed! ${word.toUpperCase()} · ${Math.min(30, Math.max(1, Math.ceil(elapsed() / 1000)))} seconden`, 'success');
     } else {
       if (result === 'expired') paintTimer(0);
       setFeedback(`${result === 'expired' ? 'Tijd om.' : 'Het antwoord:'} ${word.toUpperCase()}`, 'ended');
