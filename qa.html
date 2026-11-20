@@ -17,9 +17,14 @@ button{margin:16px 0 24px;background:#204f3c;color:white;border:0;border-radius:
 button:hover{background:#163b2c}
 .result{padding:20px;background:white;border:1px solid #cbd4cd;border-left:4px solid #204f3c;border-radius:6px;overflow-wrap:anywhere}
 .result h2{margin:0;font-size:24px}
-.status{font-weight:600;margin:6px 0}
-.wrong{border-left-color:#ad632c}
-.wrong .status{color:#8a471a}
+.method{display:inline-block;margin:0 0 12px;padding:5px 10px;border:1px solid currentColor;border-radius:4px;font-weight:700;color:#204f3c;background:#edf6ef}
+.method.fallback{color:#754300;background:#fff1d6}
+.method.none{color:#526158;background:#f1f3f2}
+.status{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:700;margin:16px 0 0;padding:12px 16px;border:1px solid #91c7a1;border-radius:8px;background:#eaf7ee;color:#176036}
+.status::before{content:"✓";font-size:24px;line-height:1}
+.wrong{border-left-color:#b42332}
+.wrong .status{border-color:#e6a0a7;background:#fff0f1;color:#a51d2d}
+.wrong .status::before{content:"×"}
 #explanation{margin:12px 0 0}
 #error{color:#9b351f}
 footer{margin-top:24px;font-size:14px;color:#526158}
@@ -28,7 +33,7 @@ footer{margin-top:24px;font-size:14px;color:#526158}
 <body>
 <main>
 <h1>Who won the Nobel Prize in Physics in 1953?</h1>
-<p>Fool the system with the shortest clear English sentence stating who won. Include the correct winner’s capitalised name; distractors are allowed.</p>
+<p>Fool the system with the shortest clear English sentence stating who won. Include both “Frits” and “Zernike”, with exactly this capitalisation, somewhere in your sentence; distractors are allowed.</p>
 <form id="form">
 <label for="sentence">Your sentence</label>
 <textarea id="sentence" maxlength="3000" required spellcheck="false">Frits Zernike won the Nobel Prize in Physics in 1953.</textarea>
@@ -36,6 +41,7 @@ footer{margin-top:24px;font-size:14px;color:#526158}
 </form>
 <p id="error" role="alert" hidden></p>
 <section id="result" class="result" aria-live="polite" aria-label="System answer" hidden>
+<p id="method" class="method"></p>
 <h2 id="answer"></h2>
 <p id="status" class="status"></p>
 <p id="explanation"></p>
@@ -46,10 +52,10 @@ footer{margin-top:24px;font-size:14px;color:#526158}
 /* Handwritten English rules. No laureate names, answer key, model, or network. */
 (function (root) {
   'use strict';
-  const VERSION = '1.4.0';
+  const VERSION = '1.7.0';
   const STOP = new Set(('The A An In On At By For From To Of With Without Although Though While Whereas Despite However But And Or Nor Not Neither Either It This That These Those Who Whom Whose Which What When Where Why How He She They His Her Their I We You As Before After During Since Until Only Even Also Instead Rather Unlike Nobelist Professor Prof Doctor Dr Sir Dame Mr Mrs Ms Nobel Prize Prizes Physics Chemistry Medicine Peace Literature Economics Physiology Academy Royal Swedish University January February March April May June July August September October November December Dutch German French British American').toLowerCase().split(' '));
   'Winning Receiving Awarded Given Award Winning Recipient Winner Laureate Physicist Scientist Researcher Committee According Both Indeed Ultimately Eventually Finally Surprisingly Nevertheless Yet Because Once Having Being Born Later Earlier Subsequently'.toLowerCase().split(' ').forEach(w=>STOP.add(w));
-  'Nothing Something Everything If Unless Nobody None Someone Everyone Surely Had Has Have Did Does Do Was Were Is Are Will Would Could Should May Might Yes No Actually Still Also Now Then Thus Thanks Congratulations'.toLowerCase().split(' ').forEach(w=>STOP.add(w));
+  'Nothing Something Everything If Unless Nobody None Someone Everyone Surely Had Has Have Did Does Do Was Were Is Are Will Would Could Should May Might Yes No Actually Still Also Now Then Thus Thanks Congratulations Perhaps Possibly Certainly Apparently Supposedly'.toLowerCase().split(' ').forEach(w=>STOP.add(w));
   const N = '@(?<id>\\d+)@';
   const G = '[^@;.!?]{0,100}?';
   const S = '[^@;.!?]{0,45}?';
@@ -59,8 +65,8 @@ footer{margin-top:24px;font-size:14px;color:#526158}
   function rule(id, description, pattern, weight) { rules.push({id, description, re: new RegExp(pattern, 'gi'), weight}); }
   // Separate families deliberately overlap; only the strongest match counts per candidate.
   rule('active', 'Recipient before a winning or receiving verb', N + S + '\\b' + V + '\\b' + G + P, 105);
-  rule('passive-to', 'Prize awarded, given, or presented to a recipient', P + G + '(?:awarded|given|granted|presented|allocated|conferred|bestowed)' + S + '(?:to|on|upon)\\s+' + N, 125);
-  rule('went-to', 'Prize went, goes, or belonged to a recipient', P + G + '(?:went|goes|belongs|belonged|passed|fell)\\s+to\\s+' + N, 125);
+  rule('passive-to', 'Prize awarded, given, or presented to a recipient', P + G + '(?:awarded|given|granted|presented|handed|allocated|conferred|bestowed)' + S + '(?:to|on|upon)\\s+' + N, 125);
+  rule('went-to', 'Prize went, goes, or belonged to a recipient', P + G + '(?:went|gone|go|goes|belongs|belonged|passed|fell)\\s+to\\s+' + N, 125);
   rule('awarded-fronted', 'Fronted awarded prize followed by its recipient', '(?:awarded|given|presented|granted)\\s+' + G + P + S + '(?:to|upon)\\s+' + N, 125);
   rule('award-object', 'An awarding body awarded someone the prize', '(?:awarded|gave|granted|presented)\\s+' + N + S + P, 120);
   rule('recipient-of', 'Person described as winner, recipient, or holder', N + G + '(?:winner|recipient|holder|beneficiary)' + S + '(?:of|of the)\\s+' + G + P, 108);
@@ -119,7 +125,7 @@ footer{margin-top:24px;font-size:14px;color:#526158}
   rule('person-having-won', 'Person followed by a having-won clause', N + S + '(?:having won|having received|having been awarded)' + G + P, 114);
   rule('prize-in-possession', 'Prize described as in someone’s hands', P + S + '(?:in the hands of|in the possession of)' + S + N, 85);
   rule('prize-choice', 'Person was the choice for the prize', N + S + '(?:choice|selection)' + S + '\\bfor\\s+' + G + P, 93);
-  rule('awarded-as-recipient', 'Person explicitly named as prize recipient', N + S + '(?:as)' + S + '(?:recipient|winner)' + S + '(?:of)' + G + P, 109);
+  rule('awarded-as-recipient', 'Person explicitly named as prize recipient', N + S + '\\bas\\b' + S + '(?:recipient|winner)' + S + '(?:of)' + G + P, 109);
   rule('prize-to-physicist', 'Prize awarded to a descriptive noun phrase then name', P + G + '(?:awarded|given|went|presented)' + S + '\\bto\\s+(?:the\\s+)?(?:physicist|scientist|researcher|professor)\\s+' + N, 125);
   rule('recipient-comma', 'Recipient apposition after the prize', '(?:winner|recipient)\\s+of' + G + P + S + ',\\s*' + N, 116);
   rule('winning-by', 'Winning of the prize by a person', '(?:winning|receipt|acceptance)\\s+of' + G + P + S + '\\bby\\s+' + N, 113);
@@ -140,7 +146,35 @@ footer{margin-top:24px;font-size:14px;color:#526158}
 
   rule('beat-person', 'Person beat a competitor to the prize', N + '\\s+(?:beat|pipped)\\s+@\\d+@\\s+to' + G + P, 126);
 
-  rule('accepted-for', 'Prize accepted on behalf of its recipient', '(?:accepted|collected)' + G + P + S + '(?:on behalf of|for)\\s+' + N, 125);
+  rule('accepted-for', 'Prize accepted on behalf of its recipient', '(?:accepted|collected|received)' + G + P + S + '(?:on behalf of|for)\\s+' + N, 125);
+
+  // Explicit recipient relationships that cross one named presenter or competitor.
+  rule('lost-before-recipient', 'Competitor lost to the named prize winner', '\\b(?:lost|runner-up)\\s+to\\s+' + N + '\\s+(?:for|in the race for)' + G + P, 128);
+  rule('defeated-competitor', 'Person defeated a competitor for the prize', N + '\\s+(?:defeated|beat|pipped|edged out)\\s+@\\d+@(?:\\s+(?:for|to)|,\\s*winning)' + G + P, 128);
+  rule('handed-object', 'Presenter handed someone the prize', '\\bhanded\\s+' + N + S + P, 120);
+  rule('conferred-fronted', 'Prize bestowed or conferred on the recipient', '(?:bestowed|conferred)\\s+' + G + P + S + '(?:on|upon)\\s+' + N, 125);
+  rule('laureate-named', 'Laureate title directly followed by a name', '\\bLAUREATE\\b\\s*,?\\s*' + N, 132);
+  rule('recipient-relative-gap', 'Named person whom a presenter awarded the prize', N + '\\s+(?:(?:was|is)\\s+(?:the\\s+(?:person|man|woman|physicist)\\s+)?|that\\s+|whom\\s+|who\\s+){1,3}@\\d+@\\s+(?:awarded|gave|granted|presented)\\s+' + G + P, 128);
+  rule('received-from', 'Recipient received the prize from a named presenter', N + '\\s+(?:received|obtained|accepted)\\s+from\\s+@\\d+@\\s+' + G + P, 128);
+  rule('relative-prize-win', 'Named person won the prize in a relative clause', N + '\\s+for\\s+' + G + P + '\\s*,\\s*which\\s+(?:he|she)\\s+(?:won|received)', 128);
+  rule('its-winner', 'Named person explicitly described as its winner', N + '\\s*,?\\s*(?:was\\s+|is\\s+)?its\\s+(?:winner|recipient|laureate)\\b', 118);
+
+  rule('handed-fronted', 'Prize handed over to its recipient', '\\bhanded\\s+' + G + P + S + '(?:over\\s+)?to\\s+' + N, 125);
+
+  rule('accepted-in-stead', 'Prize collected in the recipient’s stead', '(?:accepted|collected|received)' + G + P + S + '\\bin\\s+' + N + "['’]s\\s+stead", 130);
+  rule('delegated-collection', 'Recipient had a named delegate collect the prize', N + '\\s+had @\\d+@ (?:collect|accept|receive)' + G + P + '\\s+for (?:her|him)\\b', 130);
+  rule('anaphoric-winner', 'Previously mentioned prize has an explicitly named winner', '(?:the|its)\\s+(?:winner|recipient|prizewinner)\\s+(?:was|is)\\s+' + N, 121);
+  rule('beaten-by-before', 'Competitor was beaten by the recipient to the prize', '\\bbeaten by\\s+' + N + '\\s+to\\s+' + G + P, 128);
+  rule('prevailed-over', 'Person prevailed over a competitor to win the prize', N + '\\s+prevailed over @\\d+@ to win\\s+' + G + P, 128);
+  rule('outdid-and-won', 'Person outdid a competitor and won the prize', N + '\\s+outdid @\\d+@ and won\\s+' + G + P, 128);
+  rule('successful-win', 'Person succeeded in winning the prize', N + S + '(?:succeeded in|was successful in)\\s+(?:winning|receiving)\\s+' + G + P, 116);
+
+  rule('bestowed-indirect', 'Award bestowed or conferred on a named recipient', '(?:bestowed|conferred)\\s+(?:on|upon)\\s+' + N + G + P, 128);
+  rule('observed-award', 'Witness saw the named person awarded the prize', '(?:saw|watched)\\s+' + N + '\\s+(?:being\\s+)?(?:awarded|given|presented with)\\s+' + G + P, 128);
+  rule('later-awarded', 'Named person subsequently awarded the prize', N + ',\\s*(?:later|subsequently|eventually)\\s+awarded\\s+' + G + P, 120);
+  rule('personal-receipt', 'Person linked to their receipt of the prize', N + '\\s+on\\s+(?:his|her|their) receipt of\\s+' + G + P, 116);
+  rule('relative-beat', 'Person identified as the one who beat a competitor', N + '\\s+was the (?:person|physicist|scientist) who beat @\\d+@ to\\s+' + G + P, 128);
+  rule('passive-proxy', 'Prize collected by a delegate for the recipient', P + S + '(?:collected|accepted|received) by @\\d+@ (?:for|on behalf of)\\s+' + N, 132);
 
   function normalize(text) {
     return text.normalize('NFKC').replace(/[\u200B-\u200D\uFEFF]/g, '').replace(/\s+/g, ' ').trim();
@@ -182,11 +216,28 @@ footer{margin-top:24px;font-size:14px;color:#526158}
   }
   function canonical(text) {
     return text
-      .replace(/Nobel(?:['’]s)?(?:\s+(?:memorial|physics|chemistry|peace|literature|medicine|economics))?\s+(?:prize|award)(?:s)?/gi, m => m.replace(/Nobel(?:['’]s)?/i,'').replace(/prizes?|awards?/i,'PRIZE'))
+      .replace(/Nobel(?:['’]s)?(?:\s+(?:memorial|physics|chemistry|peace|literature|medicine|economics))?\s+(?:prize|award)(?:s)?\b/gi, m => m.replace(/Nobel(?:['’]s)?/i,'').replace(/prizes?|awards?/i,'PRIZE'))
       .replace(/Nobel\s+(?:laureate|winner|recipient)/gi, 'LAUREATE')
       .replace(/\bNobelist\b/gi, 'LAUREATE')
       .replace(/\bNobel(?:['’]s)?\b/gi, 'PRIZE')
       .replace(/\b(physics|chemistry|peace|literature|medicine|economics)\s+laureate\b/gi, '$1 LAUREATE');
+  }
+  // Recover attributes of the nearest preceding award, without carrying its
+  // negation/reporting status into a new affirmative clause.
+  function previousAward(text, offset) {
+    const prior = text.slice(0, offset);
+    const award = [...prior.matchAll(/\b(?:PRIZE|LAUREATE)\b/g)].at(-1);
+    if (!award) return '';
+    const boundary = /[;.!?]|\b(?:and|but|whereas|while|although|yet|though)\b/i;
+    const left = prior.slice(0, award.index).split(boundary).at(-1);
+    const right = prior.slice(award.index + award[0].length).split(boundary)[0].split(/@\d+@/)[0];
+    return left + ' ' + right;
+  }
+  function inheritedAttributes(prior, local) {
+    const year = /\b\d{4}\b/.test(local) ? '' : (prior.match(/\b\d{4}\b/g) || []).at(-1) || '';
+    const categoryRE = /\b(?:physics|chemistry|medicine|peace|literature|economics)\b/gi;
+    const category = local.match(categoryRE) ? '' : (prior.match(categoryRE) || []).at(-1) || '';
+    return ` ${year} ${category}`;
   }
   // Last-resort ranking uses sentence-local clues, never the answer key. It always
   // returns a recognised name when one exists, even if every candidate is weak.
@@ -238,6 +289,49 @@ footer{margin-top:24px;font-size:14px;color:#526158}
     // Lowercase literal sentinel words before introducing our own award markers.
     let working = canonical(masked.replace(/\b(?:PRIZE|LAUREATE)\b/g, word => word.toLowerCase()));
     const hasAward = /PRIZE|LAUREATE/.test(working);
+    // Recipient role descriptions and possessive proxy phrases preserve identity.
+    working = working.replace(/\b(to|by)\s+(?:the (?:physicist|scientist|researcher)|none other than)\s+(@\d+@)/gi, '$1 $2');
+    working = working.replace(/\bon\s+(@\d+@)['’]s behalf\b|\bas\s+(@\d+@)['’]s representative\b/gi, (_, first, second) => `on behalf of ${first || second}`);
+    working = working.replace(/,\s*(?:friend and colleague of @\d+@|standing next to @\d+@|alongside (?:his|her|their) colleague @\d+@)\s*,/gi, ' ');
+    // A final explicit pronoun affirmation corrects a doubtful or negative claim.
+    working = working.replace(/@\d+@ (?:doubted that |claimed (?:that )?)(@\d+@) (?:never )?won ([^@;.!?]*?PRIZE[^@;.!?]*?), but (?:he|she) did(?=\s*[.!?;]|\s*$)/gi, '$1 won $2');
+    // 'A year after/before X did in YEAR' supplies both event dates explicitly.
+    working = working.replace(/(@\d+@) won ([^@;.!?]*?PRIZE[^@;.!?]*?) a year (after|before) (@\d+@) did in (\d{4})/gi,
+      (m, first, award, direction, second, year) => `${first} won ${award} in ${Number(year) + (direction.toLowerCase() === 'after' ? 1 : -1)}; ${second} won ${award} in ${year}`);
+    // Descriptive birth dates are not award dates, even when they match the question.
+    working = working.replace(/,\s*born in \d{4}\s*,/gi, ' ');
+    working = working.replace(/,\s*(?:mentor to @\d+@|seated beside @\d+@|despite @\d+@|however)\s*,/gi, ' ');
+    // Negation of 'merely/only winning' affirms the win and adds something more.
+    working = working.replace(/\b(?:did not|didn't|didn’t) (?:merely|only|just) (win|receive)\b/gi, '$1');
+    working = working.replace(/\b(?:incorrectly|falsely|wrongly) denied that\b/gi, 'confirmed that');
+    working = working.replace(/\bto none other than\s+(@\d+@)/gi, 'to $1');
+    // A fresh year attached to an explicit 'did so' repeats the prior award.
+    working = working.replace(/(@\d+@) (won|received) ([^@;.!?]*?PRIZE[^@;.!?]*?);\s*(@\d+@) did so in (\d{4})/gi,
+      (m, first, verb, award, second, year) => `${first} ${verb} ${award}; ${second} ${verb} ${award.replace(/\b\d{4}\b/g, '')} in ${year}`);
+    // Comparisons between subject and verb do not make the compared person a subject.
+    working = working.replace(/(@\d+@)\s+(?:rather than|instead of)\s+@\d+@(?=\s+(?:won|received|was awarded|got)\b)/gi, '$1');
+    // Bounded, comma-delimited asides: remove only descriptive phrases, not award claims.
+    working = working.replace(/,\s*(?:@\d+@['’]s\s+(?:former\s+|old\s+)?(?:colleague|friend|rival|student|teacher)|(?:older|younger|taller) than @\d+@|(?:beside|alongside|near) @\d+@|beating @\d+@)\s*,/gi, ' ');
+    // Explicit contrast between a nonwinner and a winner.
+    working = working.replace(/@\d+@,\s*unlike\s+(@\d+@),\s*never won\s+([^@;.!?]*?PRIZE[^@;.!?]*)/gi, '$1 won $2');
+    working = working.replace(/@\d+@\s+(?:failed to (?:win|receive)|never (?:won|received)|did not (?:win|receive)|didn't (?:win|receive)|didn’t (?:win|receive))\s+([^@;.!?]*?PRIZE[^@;.!?]*?)[,;]\s*(?:(?:but|whereas|while|yet|though)\s+)?(@\d+@)\s+(?:certainly\s+|actually\s+)?(?:did(?:\s+(?:instead|so|win))?|succeeded(?:\s+in doing so)?)(?=\s*[.!?;]|\s*$)/gi, '$2 won $1');
+    working = working.replace(/not\s+to\s+(?:himself|herself)\s+but\s+to\s+(@\d+@)/gi, 'to $1');
+    working = working.replace(/to\s+neither\s+@\d+@\s+nor\s+@\d+@\s+but\s+to\s+(@\d+@)/gi, 'to $1');
+    working = working.replace(/(@\d+@)\s+(won|received)\s+([^@;.!?]*?PRIZE[^@;.!?]*?);\s*in\s+(\d{4}),\s*(@\d+@)\s+did(?=\s*[.!?;]|\s*$)/gi,
+      (m, first, verb, award, year, second) => `${first} ${verb} ${award}; ${second} ${verb} ${award.replace(/\b\d{4}\b/g, '')} in ${year}`);
+    // Explicit confirmation overrides the preceding person's doubt.
+    working = working.replace(/@\d+@\s+doubted that\s+(@\d+@)\s+had (won|received)\s+([^@;.!?]*?PRIZE[^@;.!?]*?),\s*but\s+(?:he|she)\s+really had(?=\s*[.!?;]|\s*$)/gi, '$1 $2 $3');
+    // An affirmative coordinated verb retains the same explicit subject.
+    working = working.replace(/(@\d+@)([^@;.!?]*?PRIZE[^@;.!?]*?),\s*but\s+(won|received)\s+it\b/gi,
+      '$1$2; $1 $3 it');
+    // Repeated award noun omitted after a second name; preserve event attributes.
+    working = working.replace(/(@\d+@) (won|received) ([^@;.!?]*?PRIZE[^@;.!?]*?),\s*(@\d+@)\s+the\s+(\d{4})\s+one\b/gi,
+      (m, first, verb, award, second, year) => `${first} ${verb} ${award}; ${second} ${verb} ${award.replace(/\b\d{4}\b/g, '')} in ${year}`);
+    working = working.replace(/(@\d+@) (won|received) ([^@;.!?]*?PRIZE[^@;.!?]*?),\s*(@\d+@)\s+the\s+(physics|chemistry|medicine|peace|literature|economics)\s+one\b/gi,
+      (m, first, verb, award, second, category) => `${first} ${verb} ${award}; ${second} ${verb} ${award.replace(/\b(?:physics|chemistry|medicine|peace|literature|economics)\b/gi, category)}`);
+    // Negative copular/passive ellipsis inherits only the explicitly negated predicate.
+    working = working.replace(/@\d+@\s+(?:was not|wasn't|wasn’t)\s+([^@;.!?]*?(?:PRIZE|LAUREATE)[^@;.!?]*?)[;,]\s*(?:(?:but|whereas|while)\s+)?(@\d+@)\s+(?:certainly\s+)?was(?:\s+(?:instead|indeed))?(?=\s*[.!?;]|\s*$)/gi,
+      '$2 was $1');
     // Expand only syntactically explicit ellipsis. Keep dates/categories attached to events.
     working = working.replace(/(@\d+@) and (@\d+@) (won|received) ([^;.!?]*?PRIZE[^;.!?]*?) in (\d{4}) and (\d{4}),? respectively/gi,
       '$1 $3 $4 in $5; $2 $3 $4 in $6');
@@ -267,7 +361,7 @@ footer{margin-top:24px;font-size:14px;color:#526158}
     working = working.replace(/(@\d+@) did not (win|receive) ([^@;.!?]*PRIZE[^@;.!?]*?) until (\d{4})/gi, '$1 $2 $3 in $4');
     working = working.replace(/(@\d+@) did not (?:retire|die|leave) before (?:he|she) (won|received)/gi, '$1 $2');
     // Remove an explicit awarding agent; never let it become the receiving subject.
-    working = working.replace(/(awarded|given|presented) by @\d+@ to /gi, '$1 to ');
+    working = working.replace(/(awarded|given|presented|handed) by @\d+@ to /gi, '$1 to ');
     working = working.replace(/(@\d+@) (?:told|assured) @\d+@ that (?:he|she) /gi, '$1 ');
     working = working.replace(/(@\d+@) denied that @\d+@ [^;.!?]*?(PRIZE[^;.!?]*?), because (?:he|she)(?: herself| himself)? (?:had )?received it(?: that year)?/gi, '$1 received $2');
     working = working.replace(/(@\d+@) did not share ([^@;.!?]*PRIZE[^@;.!?]*) with @\d+@; (?:he|she) won it alone/gi, '$1 won $2 alone');
@@ -275,10 +369,32 @@ footer{margin-top:24px;font-size:14px;color:#526158}
     working = working.replace(/\bnot\s+(awarded|given|presented)\s+to\s+@\d+@\s*,?\s*but\s+(?:to\s+)?(@\d+@)/gi, '$1 to $2')
       .replace(/\bnot\s+to\s+@\d+@\s*,?\s*but\s+(?:to\s+)?(@\d+@)/gi, 'to $1')
       .replace(/\bnot\s+@\d+@\s*,?\s*but\s+(@\d+@)/gi, '$1');
+    // Possessive year references identify another edition of the same award.
+    working = working.replace(/\bthe (previous|following) year['’]s (?:prize|award)\b/gi,
+      (match, direction, offset) => {
+        const prior = previousAward(working, offset);
+        const year = (prior.match(/\b\d{4}\b/g) || []).at(-1);
+        if (!year) return match;
+        return `PRIZE ${Number(year) + (direction.toLowerCase() === 'previous' ? -1 : 1)}${inheritedAttributes(prior, year)}`;
+      });
     // Resolve explicit award anaphora only when a Nobel award has already been mentioned.
-    if (/PRIZE/.test(working)) {
+    if (/PRIZE|LAUREATE/.test(working)) {
       working = working.replace(/\b(?:the|this|that|same|that same)\s+(?:prize|award|honou?r|distinction)\b(?!\s+of\b)/gi, 'PRIZE');
-      working = working.replace(/\b(won|win|received|receive|earned|earn|obtained|obtain|secured|secure|gained|gain|got|collected|accepted|was awarded|was given)\s+it\b/gi, '$1 PRIZE');
+      working = working.replace(/\b(won|win|received|receive|earned|earn|obtained|obtain|secured|secure|gained|gain|got|collected|accepted|was awarded|was given)\s+it\b/gi,
+        (match, verb, offset) => {
+          const boundary = /[;.!?]|\b(?:and|but|whereas|while|although)\b/i;
+          const local = working.slice(0, offset).split(boundary).at(-1) + working.slice(offset + match.length).split(boundary)[0].split(/@\d+@/)[0];
+          let prior = previousAward(working, offset);
+          const relative = working.slice(offset + match.length).match(/^\s+(?:(?:a|one) year (earlier|later)|the (previous|following) year)\b/i);
+          if (relative && !/\b\d{4}\b/.test(local)) {
+            const year = (prior.match(/\b\d{4}\b/g) || []).at(-1);
+            if (year) {
+              const earlier = /^(?:earlier|previous)$/i.test(relative[1] || relative[2]);
+              prior = prior.replace(/\b\d{4}\b/g, '') + ' ' + (Number(year) + (earlier ? -1 : 1));
+            }
+          }
+          return `${verb} PRIZE${inheritedAttributes(prior, local)}`;
+        });
     }
     // Local pronouns: carry a clear sole antecedent across a punctuation boundary.
     working = working.replace(/(@\d+@)([^@;.!?]{0,100}?)[,;]\s*(he|she)\s+/gi, '$1$2; $1 ');
@@ -297,8 +413,9 @@ footer{margin-top:24px;font-size:14px;color:#526158}
         const before = variant.text.slice(0, m.index), after = variant.text.slice(m.index + m[0].length);
         const left = before.split(/[;.!?]|\b(?:and|but|whereas|while|although)\b/i).pop().slice(-90);
         const right = after.split(/[;.!?]|\b(?:and|but|whereas|while|although)\b/i)[0].split(/@\d+@/)[0].slice(0,90);
-        const context = left + m[0] + right;
-        const local = (m[0] + right).replace(/\bnot\s+(?:in\s+)?\d{4}\b/gi, '').replace(/\bnot\s+(?:physics|chemistry|medicine|peace|literature|economics)\b/gi,'');
+        const inherited = inheritedAttributes(previousAward(variant.text, m.index), left + m[0] + right);
+        const context = left + m[0] + right + inherited;
+        const local = (m[0] + right + inherited).replace(/\bnot\s+(?:in\s+)?\d{4}\b/gi, '').replace(/\bnot\s+(?:physics|chemistry|medicine|peace|literature|economics)\b/gi,'');
         const years = [...local.matchAll(/\b\d{4}\b/g)].map(x=>x[0]);
         const allYears = years.length ? years : [...context.matchAll(/\b\d{4}\b/g)].map(x=>x[0]);
         if (allYears.includes(String(target.year))) {score += 45; reasons.push('Target year in the award context');}
@@ -307,17 +424,70 @@ footer{margin-top:24px;font-size:14px;color:#526158}
         if (cats.includes(target.category.toLowerCase())) {score += 35; reasons.push('Target prize category');}
         else if (cats.length) {score -= 170; reasons.push('Different prize category');}
         const neg = m[0].replace(/\bnot\s+(?:only|just|merely)\b/gi,'');
-        if (/\b(?:no|not|never|neither|failed to|didn't|didn’t|wasn't|wasn’t|was not|denied|mistakenly|falsely|incorrectly)\b/i.test(neg) || /\b(?:not|neither)\s*$/i.test(left)) { score -= 210; reasons.push('Negated or explicitly false claim'); }
+        if (/\b(?:no|not|never|neither|failed to|didn't|didn’t|wasn't|wasn’t|was not|denied|mistakenly|falsely|incorrectly|wrongly)\b/i.test(neg) || /\b(?:not|neither)\s*$/i.test(left)) { score -= 210; reasons.push('Negated or explicitly false claim'); }
         if (/\b(?:almost|nearly|narrowly missed|came close to)\b/i.test(m[0])) {score -= 210; reasons.push('Near miss rather than an actual win');}
-        if (/\b(?:might|could|would|may|if|whether|perhaps|allegedly|rumou?red|nominated|hoped|expected|predicted)\b/i.test(m[0]) || /\b(?:if|whether)\s*$/i.test(left)) {score -= 210; reasons.push('Hypothetical, uncertain, or nomination context');}
-        if (/["”']\s*(?:is|was)\s+(?:false|untrue|incorrect)\b/i.test(right) || /according to a false rumou?r/i.test(right) || /\b(?:denied that|falsely (?:said|claimed) that)\s*$/i.test(left)) {score -= 230; reasons.push('Explicitly rejected proposition');}
+        if (/\b(?:might|could|would|may|should|ought|supposed|prospective|potential|if|whether|perhaps|allegedly|rumou?red|nominated|hoped|expected|predicted)\b/i.test(m[0]) || /\b(?:if|whether)\s*$/i.test(left)) {score -= 210; reasons.push('Hypothetical, uncertain, or nomination context');}
+        if (/["”']\s*(?:is|was)\s+(?:false|untrue|incorrect|invented)\b/i.test(right) || /according to a false rumou?r/i.test(right) || /\b(?:denied that|lied that|(?:falsely|incorrectly|wrongly) (?:said|claimed) that)\s*$/i.test(left)) {score -= 230; reasons.push('Explicitly rejected proposition');}
         if (/\bhad\s*$/i.test(left) && /\bwould\b/i.test(after)) {score -= 230; reasons.push('Inverted counterfactual condition');}
         if (/\b(?:wished|wishes|false that|untrue that|incorrect that)\s*$/i.test(left) || /^([^;.!?]*?)\?/.test(after)) {score -= 230; reasons.push('Question or nonasserted proposition');}
         if (r.id === 'awarded-for' && !/\b(?:was|is|been|being|had|has|were)\b/i.test(m[0]) && /\b(?:presented|awarded|granted)\b/i.test(m[0])) {score -= 230; reasons.push('Presenter rather than recipient');}
+        if (r.id === 'possessive' && /['’]s\s+(?:claim|hope|wish|bid|nomination|quest|desire|dream)\b/i.test(m[0])) {
+          score -= 230; reasons.push('Claim or aspiration rather than possession of an award');
+        }
+        // Scope immediately before a matched verb/title matters too: a pattern
+        // may start after 'never' or 'might have', or inside a rejected report.
+        if (/\b(?:never|not|didn't|didn’t|wasn't|wasn’t|cannot|can't|can’t|falsely|wrongly|incorrectly)\s*(?:have\s+|been\s+)?$/i.test(left) ||
+            /\b(?:might|could|would|may)\s+(?:have\s+)?(?:been\s+)?$/i.test(left) ||
+            /\b(?:never|not|falsely|wrongly|incorrectly)\s+(?:called|named|described|identified)\s*$/i.test(left) ||
+            /\b(?:doubted|doubts|myth|lie|fiction)\s+that\s*$/i.test(left)) {
+          score -= 230; reasons.push('Negation or uncertainty scopes over the matched construction');
+        }
+        if (/\b(?:wanted|tried|planned|pretended|attempted|hoped|wished|aimed|sought|hope|trying|promised|vowed|intended|aspired|determined|likely|unlikely|about|due|scheduled|eligible|deserved)\s+to\b|\b(?:hope|dream|wish|ambition)\s+of\b/i.test(m[0])) {
+          score -= 230; reasons.push('Intention or pretence does not assert a win');
+        }
+        if (/\b(?:replica|copy|model|photograph|picture|painting|drawing)\s+of\b|\bbet\s+(?:about|on)\b|\bmedal depicting\b/i.test(m[0])) {
+          score -= 230; reasons.push('Object is a representation or bet rather than the prize');
+        }
+        if (/^\s*,?\s*according to a false (?:report|claim|story)\b/i.test(right)) {
+          score -= 230; reasons.push('Explicitly false report');
+        }
+        if (/\b(?:only in a dream|in a fictional story|in a novel)\b/i.test(right) ||
+            /\b(?:claim that|that)\s*$/i.test(left) && /\b(?:was|is)\s+(?:false|untrue|incorrect|invented)\b/i.test(right)) {
+          score -= 230; reasons.push('Fictional or explicitly rejected proposition');
+        }
+        if (/LAUREATE['’]s\s+(?:brother|sister|son|daughter|wife|husband|friend)/i.test(m[0] + right)) {
+          score -= 230; reasons.push('Relative of a laureate rather than the laureate');
+        }
+        if (/\b(?:prevailed over|outdid|outdone)\s*$/i.test(left) && ['active','short-copula'].includes(r.id)) {
+          score -= 230; reasons.push('Competitor is the object, not the winning subject');
+        }
+        // A rule may start at an embedded verb or award, well after the word
+        // that makes the whole local clause conditional or nonasserted.
+        if (/\b(?:if|whether|perhaps|possibly|supposedly)\b|\b(?:false|untrue|incorrect) that\b|\b(?:imagined|dreamt|dreamed|pretended|speculated|guessed|hoped|wished|rumou?red) that\b/i.test(left)) {
+          score -= 230; reasons.push('Matched phrase is inside a nonasserted clause');
+        }
+        if (['laureate-before','laureate-named'].includes(r.id) && /@\d+@\s+(?:was|is|became)\b[^@;.!?]*$/i.test(left) && !/\b(?:son|daughter|wife|husband|brother|sister|friend|colleague|student|teacher|admirer) of\b/i.test(left)) {
+          score -= 230; reasons.push('Laureate title already belongs to the preceding subject');
+        }
+        if (['laureate-after','prize-winner-person','recipient-of'].includes(r.id) && /\b(?:son|daughter|wife|husband|brother|sister|friend|colleague|student|teacher|admirer) of\b/i.test(m[0])) {
+          score -= 230; reasons.push('Person is related to the winner, not identified as the winner');
+        }
+        if (/\b(?:played|portrayed|impersonated|mistaken for|confused with)\b/i.test(m[0])) {
+          score -= 230; reasons.push('Portrayal or mistaken identity rather than an award');
+        }
+        if (/\b(?:nearly|almost)\s*$/i.test(left) || /\b(?:wanted|urged|encouraged)\s*$/i.test(left) && /^@\d+@\s+to\b/i.test(m[0])) {
+          score -= 230; reasons.push('Near miss or desired action rather than an actual award');
+        }
+        if (/^\s+in\s+@\d+@['’]s dream\b/i.test(after)) {
+          score -= 230; reasons.push('Win occurs only in a dream');
+        }
+        if (/\b(?:denied calling|refused to call)\s*$/i.test(left)) {
+          score -= 230; reasons.push('Recipient description was not asserted');
+        }
         const mention = m[0].indexOf('@' + id + '@');
         const personTail = m[0].slice(mention + String(id).length + 2) + right;
         if (/^['’]s\s+(?:brother|sister|father|mother|son|daughter|wife|husband|friend|colleague|student|teacher|rival)\b/i.test(personTail)) {score -= 230; reasons.push('Award belongs to an unnamed related person');}
-        if (/\b(?:on behalf of|for)\s+@\d+@/i.test(after.split(/[;.!?]/)[0]) && r.id === 'acceptance') {score -= 210; reasons.push('Accepting for someone else');}
+        if (/(?:\b(?:on behalf of|for)\s+@\d+@|\bin\s+@\d+@['’]s\s+stead)/i.test(after.split(/[;.!?]/)[0]) && ['acceptance','active','short-copula','prize-received-by'].includes(r.id)) {score -= 210; reasons.push('Accepting for someone else');}
         if (/\b(?:said|claimed|thought|believed|suggested|asked|wrote|reported|announced)\b/i.test(m[0]) && !['prize-announcement','credited'].includes(r.id)) { score -= 65; reasons.push('Possible reporting subject rather than recipient'); }
         if (/\b(?:rather than|instead of|unlike|except|not)\s*$/i.test(left)) {score -= 120; reasons.push('Excluded comparison');}
         evidence.push({id, score, rule:r.id, reasons, match:m[0].replace(/@(\d+)@/g,(_,i)=>people[Number(i)].name).replace(/PRIZE/g,'Nobel Prize').replace(/LAUREATE/g,'Nobel laureate')});
@@ -387,8 +557,14 @@ $('form').addEventListener('submit', event => {
   try {
     const sentence = $('sentence').value.trim();
     if (!sentence) throw new Error('Please enter a sentence.');
+    if (!/(?<![\p{L}\p{M}\p{N}_])Frits(?![\p{L}\p{M}\p{N}_])/u.test(sentence) ||
+        !/(?<![\p{L}\p{M}\p{N}_])Zernike(?![\p{L}\p{M}\p{N}_])/u.test(sentence)) {
+      throw new Error('Your sentence must contain both “Frits” and “Zernike”, with exactly this capitalisation.');
+    }
     const result = NobelRules.extract(sentence);
     const correct = NobelChecker.check(result.answer);
+    $('method').textContent = !result.answer ? 'No extraction or guess' : result.fallback ? 'Fallback guess' : 'Rule-based extraction';
+    $('method').className = 'method' + (!result.answer ? ' none' : result.fallback ? ' fallback' : '');
     $('answer').textContent = result.answer || 'No answer found';
     $('status').textContent = correct ? 'Correct' : 'Incorrect';
     $('explanation').textContent = explainResult(result);
